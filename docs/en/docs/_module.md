@@ -5,12 +5,12 @@
 | Name | weixin-java-miniapp-demo |
 | Language | .java |
 | Code Path | weixin-java-miniapp-demo |
-| Brief Description | WeChat Mini Program backend service module, including core controllers, configuration center, and error handling system. Supports media management, session maintenance, and WeChat interaction, utilizing ThreadLocal to ensure thread safety. Features include OAuth2.0 authorization, AES decryption, file upload, and message routing, adhering to RESTful style to guarantee high-concurrency security. |
+| Brief Description | The WeChat Mini Program backend service module, built on Spring Boot, provides application configuration, error handling, business logic, and multi-tenant management functionalities. Core services include user authorization, media management, multi-tenant configuration, and WeChat message processing, relying on the WeChat SDK and JSON tools to ensure thread safety. |
 
 # Module List
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| [_module.md](src/main/java/com/_module.md) | folder | WeChat Mini Program backend core modules, including media management, user sessions, and WeChat interaction functionalities, utilizing ThreadLocal to ensure thread safety. The configuration center manages multiple accounts and message routing, while the error handling module uniformly processes status codes such as 404/500. Dependent on WeChat SDK and Spring framework, supporting high-concurrency stateless design. |
+| [_module.md](src/main/java/com/_module.md) | folder | The Spring Boot WeChat Mini Program Demo includes a startup class, error handling, JSON utilities, controllers, and configuration modules. The startup class follows a standard structure, the error module handles 404/500 redirections, the utility class provides JSON serialization, the controllers manage media and user messages, and the configuration module handles multi-account initialization. |
 
 

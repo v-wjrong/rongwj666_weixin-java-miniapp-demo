@@ -6,15 +6,15 @@
 | 编码语言 | .java |
 | 代码路径 | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/config |
 | 包名 | docs.src.main.java.com.github.binarywang.demo.wx.miniapp.config |
-| 概述说明 | WxMaProperties类配置微信小程序属性，含appid、secret等字段。WxMaConfiguration类初始化小程序服务，设置消息路由规则，处理文本、图片等消息。 |
+| 概述说明 | WxMaProperties类配置微信小程序属性，含appid、secret等字段。WxMaConfiguration类初始化小程序服务和消息路由，处理订阅、文本等消息类型，含异常处理。 |
 
 # 说明
 
 ## 概述  
-该模块是微信小程序后端服务的配置中心，核心职责是管理多账号配置和消息路由规则。通过WxMaProperties类定义小程序基础属性（如AppID/Secret），WxMaConfiguration类实现服务初始化和消息处理。关键数据结构包括Config列表（含5项认证字段）和消息路由器（类似事件总线模式）。依赖项仅微信SDK。例如支持多账号动态加载，消息处理涵盖文本/图片/二维码等场景。
+该模块是微信小程序后端服务的配置中心，核心职责是管理多账号的小程序配置并初始化消息处理服务。接口规范遵循Spring Boot配置绑定，通过`@ConfigurationProperties`加载`wx.miniapp`前缀的配置项。关键数据结构包括`WxMaProperties`中的`Config`列表，包含AppID、Secret等认证字段，以及消息格式设置。外部依赖主要为微信小程序Java SDK和Spring Boot配置模块。例如，支持XML/JSON消息格式配置，并验证字段有效性。
 
 ## 主要业务场景  
-模块主要处理两类流程：1) 服务初始化时校验配置并创建WxMaService实例；2) 消息路由时根据类型调用对应处理器（如上传图片到临时素材库）。典型交互模式为：用户消息→匹配处理器→通过客服接口响应。例如二维码消息触发生成并返回图片URL，订阅消息自动回复预设内容。完整功能覆盖从服务配置到消息分发的全链路。
+模块用于快速初始化多账号的小程序服务实例，类似工厂模式，同时构建消息路由规则链。业务流程包括：读取配置→校验参数→创建服务→注册处理器（如订阅消息、图片上传等）。交互模式通过路由规则匹配消息类型并分发到对应处理器，类似事件总线模式。典型应用包括发送客服消息、生成二维码等。例如，捕获`WxErrorException`统一处理微信API异常。
 
 
 ### 包内部结构视图
@@ -25,13 +25,13 @@ graph TD
     config --> WxMaConfiguration.java
 ```
 
-该流程图展示了微信小程序demo项目中配置模块的层级结构。根节点为config目录，包含两个Java配置文件：WxMaProperties.java用于属性配置，WxMaConfiguration.java实现核心配置逻辑。这种结构体现了Spring Boot项目中典型的配置类组织方式。
+该流程图展示了微信小程序demo项目中配置模块的文件结构。config目录下包含两个Java配置文件：WxMaProperties.java用于存储小程序属性配置，WxMaConfiguration.java负责小程序相关配置的初始化。这种结构清晰地分离了配置属性和配置逻辑。
 
 # 文件列表
 
 | 名称   | 类型  | 说明 |
 |-------|------|-------------|
 | [WxMaProperties.java](WxMaProperties.md) | file | WxMaProperties类定义微信小程序配置属性，包含多个Config对象，每个Config对象有appid、secret、token、aesKey和msgDataFormat字段。 |
-| [WxMaConfiguration.java](WxMaConfiguration.md) | file | 微信小程序配置类，初始化服务及消息路由，处理订阅、文本、图片和二维码消息。 |
+| [WxMaConfiguration.java](WxMaConfiguration.md) | file | 微信小程序配置类，包含服务初始化和消息路由设置。通过WxMaProperties加载配置，创建WxMaService处理多账号，定义消息处理器处理订阅、文本、图片和二维码消息。 |
 
 

@@ -11,7 +11,7 @@
 
 # Description
 
-This is a Spring MVC controller class specifically designed to handle error page requests. The class is named ErrorController and is mapped to the "/error" path via the @RequestMapping annotation. It contains two GET request handling methods: error404() for the 404 error path "/error/404" and error500() for the 500 error path "/error/500". Both methods return a view string named "error" for rendering the error pages.
+This is a Spring MVC controller class specifically designed to handle error page requests. The class is named ErrorController and is mapped to the "/error" path via the @RequestMapping annotation. It contains two GET request handling methods: error404() processes 404 errors at the path "/error/404", and error500() processes 500 errors at the path "/error/500". Both methods return a view string named "error" for rendering the error pages.
 
 # Class Summary
 
@@ -75,7 +75,7 @@ graph TD
     G --> I
 ```
 
-This flowchart illustrates the structure of the Spring MVC controller `ErrorController`, which includes a class-level `@RequestMapping` and two methods handling different HTTP error codes. Each method specifies path mappings (/404 and /500) via `@GetMapping` and returns the view name "error". The class is annotated with `@Controller`, indicating it is a component that handles HTTP requests. The overall design centralizes routing logic for 404 and 500 error pages.
+This flowchart illustrates the structure of the Spring MVC `ErrorController`, which includes a class-level `@RequestMapping` and two methods handling different HTTP error codes. Each method specifies path mappings (/404 and /500) via `@GetMapping` and returns the "error" view name. The `@Controller` annotation indicates this is an HTTP request-handling component, with the overall design centralized to route 404 and 500 error pages.
 
 ### Field List
 
