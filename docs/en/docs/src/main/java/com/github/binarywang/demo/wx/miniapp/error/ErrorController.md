@@ -7,17 +7,17 @@
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/error/ErrorController.java |
 | Package Name | com.github.binarywang.demo.wx.miniapp.error |
 | Dependencies | ['org.springframework.stereotype.Controller', 'org.springframework.web.bind.annotation.GetMapping', 'org.springframework.web.bind.annotation.RequestMapping'] |
-| Brief Description | This is a Spring MVC controller that handles 404 and 500 error requests, returning error pages. |
+| Brief Description | Spring controller handles 404 and 500 errors, returning a unified error page. |
 
 # Description
 
-This is a Spring MVC controller class specifically designed to handle error page requests. The class is named ErrorController and is mapped to the "/error" path via the @RequestMapping annotation. It contains two GET request handling methods: error404() processes 404 errors at the path "/error/404", and error500() processes 500 errors at the path "/error/500". Both methods return a view string named "error" for rendering the error pages.
+This is a Spring MVC controller class designed to handle error page requests. The class is annotated with `@Controller`, indicating it is a controller component. The root path is mapped to `"/error"` via the `@RequestMapping` annotation. The class contains two methods for handling GET requests: the `error404()` method processes requests to the `"/404"` path and returns the `"error"` view, while the `error500()` method handles requests to the `"/500"` path and also returns the `"error"` view. These two methods correspond to page handling for HTTP 404 and 500 error status codes, respectively.
 
 # Class Summary
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| ErrorController | class | The ErrorController handles 404 and 500 errors, returning a unified error page. |
+| ErrorController | class | Java controller class that handles 404 and 500 error requests and returns error pages. |
 
 
 
@@ -28,7 +28,7 @@ This is a Spring MVC controller class specifically designed to handle error page
 | Access Modifier | @Controller;@RequestMapping("/error");public |
 | Type | class |
 | Name | ErrorController |
-| Description | The ErrorController handles 404 and 500 errors, returning a unified error page. |
+| Description | Java controller class that handles 404 and 500 error requests and returns error pages. |
 
 
 ### UML Class Diagram
@@ -40,15 +40,10 @@ classDiagram
         +error404() String
         +error500() String
     }
-    ErrorController --> SpringFramework : Dependency
-    note for ErrorController "Handles HTTP requests under the /error path"
-
-    class SpringFramework {
-        <<Framework>>
-    }
+    ErrorController --> "Spring Framework" : Dependency
 ```
 
-Class Diagram Description: This diagram illustrates a Spring MVC ErrorController class annotated with @Controller, which handles HTTP requests under the "/error" path. The class contains two public methods, error404() and error500(), corresponding to GET requests for "/404" and "/500" paths respectively, both returning the "error" view string. The class depends on the core functionality of the Spring Framework, representing a typical MVC controller implementation structure.
+This code demonstrates a Spring MVC controller class ErrorController that handles requests for two HTTP error status codes (404 and 500). The class is annotated with @Controller, indicating it is a Spring MVC controller mapped to the "/error" path. It contains two public methods: error404() and error500(), which handle GET requests for the "/error/404" and "/error/500" paths respectively, both returning the same "error" view name. This controller relies on the Spring Framework's infrastructure to implement request mapping and view resolution functionality, primarily used for centralized handling of system error page requests.
 
 
 ### Internal Method Call Graph
@@ -57,12 +52,12 @@ Class Diagram Description: This diagram illustrates a Spring MVC ErrorController
 graph TD
     A["Class ErrorController"]
     B["Annotation: @Controller"]
-    C["Class-level mapping: @RequestMapping('/error')"]
+    C["Class Annotation: @RequestMapping('/error')"]
     D["Method: error404()"]
-    E["Method-level mapping: @GetMapping('/404')"]
+    E["Method Annotation: @GetMapping('/404')"]
     F["Return: 'error'"]
     G["Method: error500()"]
-    H["Method-level mapping: @GetMapping('/500')"]
+    H["Method Annotation: @GetMapping('/500')"]
     I["Return: 'error'"]
 
     A --> B
@@ -75,7 +70,7 @@ graph TD
     G --> I
 ```
 
-This flowchart illustrates the structure of the Spring MVC `ErrorController`, which includes a class-level `@RequestMapping` and two methods handling different HTTP error codes. Each method specifies path mappings (/404 and /500) via `@GetMapping` and returns the "error" view name. The `@Controller` annotation indicates this is an HTTP request-handling component, with the overall design centralized to route 404 and 500 error pages.
+This flowchart illustrates the structure of the ErrorController class in Spring MVC. The controller class is marked with @Controller and @RequestMapping annotations, containing two GET request handling methods: error404() and error500(), mapped to "/error/404" and "/error/500" paths respectively. Both methods return a view string named "error" for rendering error pages. The diagram clearly presents the annotation relationships between classes/methods and the flow of return values.
 
 ### Field List
 
@@ -86,8 +81,8 @@ This flowchart illustrates the structure of the Spring MVC `ErrorController`, wh
 
 | Name  | Type  | Description |
 |-------|-------|------|
-| error500 | String | This is a Spring MVC GET request handling method with the path "/500", which returns the string "error". |
-| error404 | String | Spring controller method, handling GET request path "/404", returning the string "error". |
+| error500 | String | This is a Spring MVC GET request handling method, mapped to the path "/500", which returns the string "error". |
+| error404 | String | Spring MVC controller method handling GET request path "/404", returning the string "error". |
 
 
 

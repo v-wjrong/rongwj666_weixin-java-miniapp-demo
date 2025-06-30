@@ -2,21 +2,46 @@
 # weixin-java-miniapp-demo
 
 ## Overview  
-This project is a Java backend solution for the WeChat Mini Program ecosystem, positioned as the "Mini Program Business Logic Hub," similar to a mobile SaaS middle platform. It primarily addresses multi-tenant management, secure interactions, and rapid iteration in the WeChat ecosystem, reducing integration complexity through standardized processes. Built on a Spring Boot monolithic architecture, it integrates the official WeChat SDK to form a development loop, with key resources including RESTful interface templates, multi-account configuration managers, and message routing components.  
+This project is a standardized backend framework for the WeChat Mini Program ecosystem (similar to Spring Boot Starter in the mini-program domain), with its core purpose being to provide out-of-the-box integration capabilities for the WeChat ecosystem. It primarily addresses the standardization of server-side development in enterprise-level mini-programs by eliminating repetitive tasks such as WeChat API integration and session management through pre-built modules. Designed as a monolithic architecture based on Spring Boot, it incorporates a deep encapsulation of the official WeChat SDK. Key resources include the auto-configured `WxMaProperties` configuration class and Starter components prefixed with `wx.miniapp`.  
 
-Technically, it functions like a "Mini Program Backend Factory," using Spring MVC to handle HTTP protocol interactions and WxMaProperties to achieve multi-instance isolation. For example, dynamic configurations are managed via Zookeeper, while ThreadLocal ensures thread safety. The architecture features a three-layer design: the Controller layer interfaces with WeChat callbacks, the Service layer handles business logic, and the Utils layer provides foundational capabilities like JSON conversion.  
+The architectural characteristics are reflected in a three-tier integration:  
+- **Base Layer**: Handles protocol communication via the WeChat Java SDK (analogous to a post office handling mail delivery).  
+- **Business Layer**: Provides modules like media management and session services (similar to a bank vault combined with front-desk reception).  
+- **Presentation Layer**: Exposes RESTful interfaces following Spring MVC conventions.  
+
+Typical implementations include maintaining multi-account configurations via Zookeeper or storing temporary `media_id` using Redis.  
 
 ## What is weixin-java-miniapp-demo?  
-This is an enhanced implementation of the official WeChat SDK, akin to a "Swiss Army Knife" for Mini Program backends. Functional modules include user authorization (similar to an OAuth gateway), media management (a temporary file relay station), and message routing (a protocol converter), all orchestrated by the WxMaDemoApplication. The technical foundation relies on WeChat's encryption protocol, using AES to decrypt user data and Redis to cache sessionKeys for rapid authentication.  
+This is a modular reference implementation for WeChat Mini Program backends, featuring four core functional modules (akin to a Swiss Army knife for mini-program backends):  
+1. **Media Manager**: Handles file uploads/downloads (similar to a cloud storage interface).  
+2. **Session Hub**: Manages user login states (analogous to an OAuth2.0 token center).  
+3. **Message Router**: Parses WeChat push events (like a telephone exchange).  
+4. **Error Handler**: Uniformly wraps exception responses.  
 
-Typical use cases include e-commerce Mini Programs, where user login triggers an authorization chain (obtaining openid → decrypting phone numbers → storing sessions), the media module handles product image uploads, and error interceptors uniformly capture WeChat API exceptions. Implementation examples include: custom 404 pages via ErrorPage mapping, JsonUtils for optimized serialization performance, and multi-tenant configurations to isolate different merchant instances. Modules collaborate through the Spring IoC container, forming an out-of-the-box backend suite.
+Modules interact via the Spring IOC container. For example, media operations depend on session validation, while error handling intercepts all controller requests.  
+
+The technical implementation is based on WeChat's open protocols, with AES encryption/decryption ensuring communication security (comparable to diplomatic cipher mechanisms). Typical use cases include:  
+- E-commerce mini-programs (handling product image uploads).  
+- Government service mini-programs (verifying user identities).  
+
+Specific examples demonstrate how to use `WxMaMessageRouter` to dispatch message events or decrypt user phone numbers via `WxMaService`. All functionalities are annotation-driven, such as controllers marked with `@WxMaController` automatically processing WeChat server callbacks.
 
 ## Quick Navigation
 
-### Developers
+### 👨‍💻 Developers
+
 - [Development Guide](summary/dev_guide.md) - Quickly get started with project development
+
+
 - [Module Description](docs/_module.md) - Detailed explanation of project modules
-### Architect
+
+
+### 👨‍💻 Architect
+
 - [System Architecture](summary/system_architecture.md) - System Architecture
-### API Documentation
+
+
+### 📄 API Documentation
+
 - [API Documentation](summary/api.md) - API Documentation
+

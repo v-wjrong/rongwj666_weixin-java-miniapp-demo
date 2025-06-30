@@ -7,17 +7,17 @@
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/controller/WxMaUserController.java |
 | Package Name | com.github.binarywang.demo.wx.miniapp.controller |
 | Dependencies | ['cn.binarywang.wx.miniapp.api.WxMaService', 'cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult', 'cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo', 'cn.binarywang.wx.miniapp.bean.WxMaUserInfo', 'cn.binarywang.wx.miniapp.util.WxMaConfigHolder', 'com.github.binarywang.demo.wx.miniapp.utils.JsonUtils', 'lombok.AllArgsConstructor', 'lombok.extern.slf4j.Slf4j', 'me.chanjar.weixin.common.error.WxErrorException', 'org.apache.commons.lang3.StringUtils', 'org.springframework.web.bind.annotation.GetMapping', 'org.springframework.web.bind.annotation.PathVariable', 'org.springframework.web.bind.annotation.RequestMapping', 'org.springframework.web.bind.annotation.RestController'] |
-| Brief Description | WeChat Mini Program User Controller, providing interfaces for login, retrieving user information and phone numbers. It requires validation of appid and parameters, returns JSON data, handles exceptions, and cleans up ThreadLocal. |
+| Brief Description | WeChat Mini Program User Controller, providing interfaces for login, retrieving user information and phone numbers, verifying appid and user data, returning JSON results, and cleaning up ThreadLocal. |
 
 # Description
 
-This is a controller class related to WeChat Mini Program users, containing three interfaces. The login interface retrieves user session information, including sessionKey and openid, using a code. The user information retrieval interface validates parameters such as sessionKey and decrypts user information. Similarly, the phone number retrieval interface decrypts phone number information after validation. All interfaces first check whether the appid configuration exists and clean up ThreadLocal after processing. Error messages are returned in case of exceptions.
+This is a WeChat Mini Program user management controller class, which includes three interfaces: the login interface verifies user credentials and returns session information; the user information interface validates and decrypts user data before returning it; the phone number interface validates and decrypts the user's bound phone number information before returning it. All interfaces require validation of the appid's validity and clear the ThreadLocal-stored configuration information upon completion of processing.
 
 # Class Summary
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| WxMaUserController | class | WeChat Mini Program User Controller, providing interfaces for login, user information, and mobile number retrieval, verifying appid and user data, returning JSON results, and clearing ThreadLocal after each request. |
+| WxMaUserController | class | WeChat Mini Program User Controller, providing interfaces for login, retrieving user information, and phone number. It returns JSON results after verifying the appid and user data, and clears ThreadLocal after each request. |
 
 
 
@@ -28,7 +28,7 @@ This is a controller class related to WeChat Mini Program users, containing thre
 | Access Modifier | @RestController;@AllArgsConstructor;@Slf4j;@RequestMapping("/wx/user/{appid}");public |
 | Type | class |
 | Name | WxMaUserController |
-| Description | WeChat Mini Program User Controller, providing interfaces for login, user information, and mobile number retrieval, verifying appid and user data, returning JSON results, and clearing ThreadLocal after each request. |
+| Description | WeChat Mini Program User Controller, providing interfaces for login, retrieving user information, and phone number. It returns JSON results after verifying the appid and user data, and clears ThreadLocal after each request. |
 
 
 ### UML Class Diagram
@@ -37,28 +37,26 @@ This is a controller class related to WeChat Mini Program users, containing thre
 classDiagram
     class WxMaUserController {
         -WxMaService wxMaService
-        +login(String appid, String code) String
-        +info(String appid, String sessionKey, String signature, String rawData, String encryptedData, String iv) String
-        +phone(String appid, String sessionKey, String signature, String rawData, String encryptedData, String iv) String
+        +String login(String appid, String code)
+        +String info(String appid, String sessionKey, String signature, String rawData, String encryptedData, String iv)
+        +String phone(String appid, String sessionKey, String signature, String rawData, String encryptedData, String iv)
     }
 
     class WxMaService {
-        <<Interface>>
-        +switchover(String appid) boolean
-        +getUserService() WxMaUserService
+        +boolean switchover(String appid)
+        +WxMaUserService getUserService()
     }
 
     class WxMaUserService {
-        <<Interface>>
-        +getSessionInfo(String code) WxMaJscode2SessionResult
-        +checkUserInfo(String sessionKey, String rawData, String signature) boolean
-        +getUserInfo(String sessionKey, String encryptedData, String iv) WxMaUserInfo
-        +getPhoneNoInfo(String sessionKey, String encryptedData, String iv) WxMaPhoneNumberInfo
+        +WxMaJscode2SessionResult getSessionInfo(String code)
+        +boolean checkUserInfo(String sessionKey, String rawData, String signature)
+        +WxMaUserInfo getUserInfo(String sessionKey, String encryptedData, String iv)
+        +WxMaPhoneNumberInfo getPhoneNoInfo(String sessionKey, String encryptedData, String iv)
     }
 
     class WxMaJscode2SessionResult {
-        +String sessionKey
-        +String openid
+        +String getSessionKey()
+        +String getOpenid()
     }
 
     class WxMaUserInfo {
@@ -66,66 +64,72 @@ classDiagram
     }
 
     class WxMaPhoneNumberInfo {
-        // Phone number info fields
+        // Phone number fields
     }
 
     class WxMaConfigHolder {
-        <<Utility>>
-        +remove() void
+        +static void remove()
     }
 
-    class JsonUtils {
-        <<Utility>>
-        +toJson(Object obj) String
-    }
-
-    WxMaUserController --> WxMaService : Dependency
-    WxMaService --> WxMaUserService : Dependency
-    WxMaUserController --> WxMaConfigHolder : Clean ThreadLocal
-    WxMaUserController --> JsonUtils : JSON conversion
+    WxMaUserController --> WxMaService : depends
+    WxMaService --> WxMaUserService : depends
+    WxMaUserService --> WxMaJscode2SessionResult : returns
+    WxMaUserService --> WxMaUserInfo : returns
+    WxMaUserService --> WxMaPhoneNumberInfo : returns
+    WxMaUserController ..> WxMaConfigHolder : uses
 ```
 
-This class diagram illustrates the core structure of a WeChat Mini Program user controller. The WxMaUserController serves as a REST controller, accessing WeChat Mini Program services through the WxMaService interface, with three key methods: login, user info retrieval, and phone number acquisition. The controller relies on WxMaUserService for session management, user verification, and data decryption, while utilizing WxMaConfigHolder for thread-local configuration management and JsonUtils for JSON conversion. The overall design adheres to the Dependency Inversion Principle, isolating concrete implementations through interfaces.
+Class diagram description: This diagram illustrates a WeChat Mini Program user management controller WxMaUserController, which invokes WeChat-related services through WxMaService. The controller provides three interfaces for login, retrieving user information, and obtaining phone numbers, relying on WxMaService to implement core business logic. WxMaService utilizes WxMaUserService to execute specific WeChat API calls, returning session information, user data, and phone number details. All operations ultimately clear configuration information stored in ThreadLocal. The class relationships clearly demonstrate the collaboration between a Spring Boot controller and the WeChat service layer.
 
 
 ### Internal Method Call Graph
 
 ```mermaid
 graph TD
-    A["WxMaUserController"]
-    B["login method"]
-    C["info method"]
-    D["phone method"]
-    E["Check code null value"]
-    F["Switch appid configuration"]
-    G["Get session info"]
-    H["Log and return result"]
-    I["Exception handling"]
-    J["Clean ThreadLocal"]
-    K["Validate user info"]
-    L["Decrypt user info"]
-    M["Decrypt phone number info"]
+    A["Class WxMaUserController"]
+    B["Property: WxMaService wxMaService"]
+    C["Method: login(String appid, String code)"]
+    D["Method: info(String appid, String sessionKey, String signature, String rawData, String encryptedData, String iv)"]
+    E["Method: phone(String appid, String sessionKey, String signature, String rawData, String encryptedData, String iv)"]
+    F["Check: StringUtils.isBlank(code)"]
+    G["Call: wxMaService.switchover(appid)"]
+    H["Call: wxMaService.getUserService().getSessionInfo(code)"]
+    I["Log: session.getSessionKey()"]
+    J["Log: session.getOpenid()"]
+    K["Return: JsonUtils.toJson(session)"]
+    L["Exception Handling: WxErrorException"]
+    M["Cleanup: WxMaConfigHolder.remove()"]
+    N["Check: wxMaService.getUserService().checkUserInfo()"]
+    O["Decrypt: wxMaService.getUserService().getUserInfo()"]
+    P["Decrypt: wxMaService.getUserService().getPhoneNoInfo()"]
+    Q["Return: JsonUtils.toJson(userInfo)"]
+    R["Return: JsonUtils.toJson(phoneNoInfo)"]
 
     A --> B
     A --> C
     A --> D
-    B --> E["Check code null value"]
-    B --> F["Switch appid configuration"]
-    B --> G["Get session info"]
-    B --> H["Log and return result"]
-    B --> I["Exception handling"]
-    B --> J["Clean ThreadLocal"]
+    A --> E
     C --> F
-    C --> K["Validate user info"]
-    C --> L["Decrypt user info"]
-    C --> J
-    D --> F
-    D --> K
-    D --> M["Decrypt phone number info"]
-    D --> J
+    C --> G
+    C --> H
+    H --> I
+    H --> J
+    H --> K
+    C --> L
+    C --> M
+    D --> G
+    D --> N
+    D --> O
+    D --> Q
+    D --> M
+    E --> G
+    E --> N
+    E --> P
+    E --> R
+    E --> M
 ```
 
-The flowchart illustrates the workflows of three main API interfaces in WxMaUserController: login handles WeChat authentication and session retrieval, info obtains basic user information, and phone processes user phone number data. All interfaces include appid configuration switching and ThreadLocal cleanup, with core differences lying in data processing logic: login focuses on session management, while info and phone handle user profile data and phone number decryption/validation respectively. Exception handling and resource cleanup are implemented throughout, demonstrating robust design.
+This code represents a WeChat Mini Program user-related controller containing three main interfaces: login, get user info (info), and get user phone number (phone). Each interface first checks if the appid configuration exists, then performs corresponding business processing, and finally cleans up ThreadLocal resources. The login interface retrieves session information via code, the user info interface requires signature verification and data decryption, while the phone number interface similarly decrypts phone number data after signature verification. All interfaces return results in JSON format and log processing information along with exception handling during execution.
 
 ### Field List
 
@@ -137,9 +141,9 @@ The flowchart illustrates the workflows of three main API interfaces in WxMaUser
 
 | Name  | Type  | Description |
 |-------|-------|------|
-| info | String | WeChat Mini Program User Information Interface: Verify the appid and user data, then return the decrypted user information. Returns an error message if failed. |
-| login | String | This is a WeChat Mini Program login interface that accepts appid and code parameters. After verifying that the code is not empty, it checks whether the appid configuration exists. It retrieves user session information, logs the activity, and returns the result in JSON format. In case of exceptions, it logs the error and cleans up the ThreadLocal. |
-| phone | String | This is an interface for a WeChat Mini Program to retrieve a user's phone number. First, it checks the appid configuration, then verifies the user information, and finally decrypts the phone number data and returns it. If any step fails, an error message is returned. |
+| login | String | This is a WeChat Mini Program login interface that receives the appid and code parameters. After verifying that the code is not empty, it switches to the corresponding appid configuration, retrieves the user session information, and returns it. In case of exceptions, it logs the error and returns an error message, and finally cleans up the ThreadLocal. |
+| info | String | The code is a backend interface for a WeChat Mini Program, designed to verify user information and decrypt returned user data. It first checks the appid configuration, then validates the user information signature, and finally decrypts the data to return the user information in JSON format. |
+| phone | String | The code is an API interface for a WeChat Mini Program to retrieve a user's phone number. It first verifies the appid and user information. If the verification fails, it returns an error; if successful, it decrypts the phone number and returns the result in JSON format. |
 
 
 

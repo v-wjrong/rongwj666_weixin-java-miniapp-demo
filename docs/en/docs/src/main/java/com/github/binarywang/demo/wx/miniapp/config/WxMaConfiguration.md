@@ -7,17 +7,17 @@
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/config/WxMaConfiguration.java |
 | Package Name | com.github.binarywang.demo.wx.miniapp.config |
 | Dependencies | ['cn.binarywang.wx.miniapp.api.WxMaService', 'cn.binarywang.wx.miniapp.api.impl.WxMaServiceImpl', 'cn.binarywang.wx.miniapp.bean.WxMaKefuMessage', 'cn.binarywang.wx.miniapp.bean.WxMaSubscribeMessage', 'cn.binarywang.wx.miniapp.config.impl.WxMaDefaultConfigImpl', 'cn.binarywang.wx.miniapp.config.impl.WxMaRedisConfigImpl', 'cn.binarywang.wx.miniapp.message.WxMaMessageHandler', 'cn.binarywang.wx.miniapp.message.WxMaMessageRouter', 'com.google.common.collect.Lists', 'lombok.extern.slf4j.Slf4j', 'me.chanjar.weixin.common.bean.result.WxMediaUploadResult', 'me.chanjar.weixin.common.error.WxErrorException', 'me.chanjar.weixin.common.error.WxRuntimeException', 'org.springframework.beans.factory.annotation.Autowired', 'org.springframework.boot.context.properties.EnableConfigurationProperties', 'org.springframework.context.annotation.Bean', 'org.springframework.context.annotation.Configuration', 'redis.clients.jedis.JedisPool', 'java.io.File', 'java.util.List', 'java.util.stream.Collectors'] |
-| Brief Description | WeChat Mini Program configuration class, containing service initialization and message routing setup. It loads configurations via WxMaProperties, creates WxMaService to handle multiple accounts, and defines message handlers to process subscription, text, image, and QR code messages. |
+| Brief Description | WeChat Mini Program configuration class, including service initialization and message routing setup, supports various message processing such as text, images, QR codes, etc. |
 
 # Description
 
-This is a configuration class for a WeChat Mini Program backend service, with main functionalities including initializing the WeChat Mini Program service and configuring message routing. The class enables configuration properties through annotations and injects WxMaProperties to obtain multi-account configurations. The wxMaService method checks the validity of the configuration before creating a multi-account Mini Program service instance. The wxMaMessageRouter method defines message processing rules, including logic for handling subscription messages, text, images, QR codes, and other types. Each message handler implements different business logic, such as sending customer service messages, logging, uploading media files, and generating QR codes. Exception handling is implemented by catching WxErrorException.
+This is a WeChat Mini Program backend configuration class, primarily responsible for initializing WeChat Mini Program services and configuring message routing. The class injects configuration properties via its constructor, validates configurations when creating a WxMaService instance, and sets multi-account parameters. The message routing section defines five message handling rules: log recording, subscription message reply, text reply, image reply, and QR code reply. Each handler implements message response logic, such as sending customer service messages, uploading media files, or generating QR codes. The configuration class utilizes Lombok logging annotations and Spring configuration annotations to ensure proper service initialization and chained processing of message routing.
 
 # Class Summary
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| WxMaConfiguration | class | WeChat Mini Program configuration class, initializes services and message routing, handles subscription, text, image, and QR code messages, including logging and error handling. |
+| WxMaConfiguration | class | This is a WeChat Mini Program configuration class, containing Bean definitions for WxMaService and WxMaMessageRouter, handling message types such as subscription messages, text, images, and QR codes. |
 
 
 
@@ -28,7 +28,7 @@ This is a configuration class for a WeChat Mini Program backend service, with ma
 | Access Modifier | @Slf4j;@Configuration;@EnableConfigurationProperties(WxMaProperties.class);public |
 | Type | class |
 | Name | WxMaConfiguration |
-| Description | WeChat Mini Program configuration class, initializes services and message routing, handles subscription, text, image, and QR code messages, including logging and error handling. |
+| Description | This is a WeChat Mini Program configuration class, containing Bean definitions for WxMaService and WxMaMessageRouter, handling message types such as subscription messages, text, images, and QR codes. |
 
 
 ### UML Class Diagram
@@ -91,19 +91,20 @@ classDiagram
 
     class WxMaMessageHandler {
         <<Interface>>
-        +handle(WxMaMessage wxMessage, Map~String, Object~ context, WxMaService service, WxMaSessionManager sessionManager) Object
+        +handle(WxMaMessage wxMessage, Map~String, Object~ context, WxMaService service, WxSessionManager sessionManager) Object
     }
 
     WxMaConfiguration --> WxMaProperties : depends
     WxMaConfiguration --> WxMaService : creates
     WxMaConfiguration --> WxMaMessageRouter : creates
     WxMaService <|-- WxMaServiceImpl : implements
-    WxMaProperties *-- WxMaProperties.Config : contains
-    WxMaMessageRouter *-- WxMaMessageRouterRule : contains
-    WxMaMessageHandler <|.. WxMaConfiguration : implements
+    WxMaProperties --> WxMaProperties.Config : contains
+    WxMaServiceImpl --> WxMaDefaultConfigImpl : uses
+    WxMaMessageRouter --> WxMaMessageRouterRule : uses
+    WxMaMessageRouterRule --> WxMaMessageHandler : uses
 ```
 
-This code represents a backend configuration class for WeChat Mini Programs, primarily responsible for initializing the WeChat Mini Program service (WxMaService) and message router (WxMaMessageRouter). The WxMaConfiguration class reads configuration information from WxMaProperties to create and configure a WxMaServiceImpl instance, while defining various message handlers (WxMaMessageHandler) to process different types of WeChat messages. The class diagram illustrates the relationships between the configuration class and core WeChat SDK components, including configuration properties, service implementation, message routing, and handlers, reflecting the fundamental architecture of WeChat Mini Program backend message processing.
+This code represents a backend configuration class for WeChat Mini Programs, primarily responsible for initializing the WeChat Mini Program service (WxMaService) and message router (WxMaMessageRouter). The WxMaConfiguration class reads configuration information from WxMaProperties to initialize WxMaService and sets up multiple message handlers to process different types of user messages. The class diagram illustrates the dependency relationships and interface implementations among these classes, including core components such as configuration property classes, service implementation classes, message routing rules, and message handlers.
 
 
 ### Internal Method Call Graph
@@ -120,10 +121,6 @@ graph TD
     H["Private Handler: textHandler"]
     I["Private Handler: picHandler"]
     J["Private Handler: qrcodeHandler"]
-    K["Process: Check non-empty configs"]
-    L["Process: Create WxMaServiceImpl instance"]
-    M["Process: Configure multi-account parameters"]
-    N["Process: Build message routing rules"]
 
     A --> B
     A --> C
@@ -134,36 +131,39 @@ graph TD
     A --> H
     A --> I
     A --> J
-    D --> K
-    D --> L
-    D --> M
-    E --> N
-    N --> G
-    N --> F
-    N --> H
-    N --> I
-    N --> J
+
+    D --> D1["Check non-empty configs"]
+    D --> D2["Create WxMaServiceImpl"]
+    D --> D3["Stream-style config mapping"]
+    D3 --> D3a["Set Appid/Secret parameters"]
+
+    E --> E1["Create message router"]
+    E1 --> E1a["Add logHandler rule"]
+    E1a --> E1b["Add subscribeMsgHandler rule"]
+    E1b --> E1c["Add textHandler rule"]
+    E1c --> E1d["Add picHandler rule"]
+    E1d --> E1e["Add qrcodeHandler rule"]
 ```
 
-This flowchart illustrates the core structure of a WeChat Mini Program configuration class. The WxMaConfiguration class injects configuration properties through its constructor and provides two key Beans: wxMaService() initializes multi-account services with configuration validation, while wxMaMessageRouter() constructs a routing chain incorporating five message processing rules. Private handlers respectively process subscription messages, logging, and text/image/QR code messages, forming a complete message processing pipeline where the image and QR code handlers additionally involve media file upload operations.
+This flowchart illustrates the core structure of a WeChat Mini Program configuration class, featuring two primary Bean creation processes: wxMaService initializes multi-account configurations by constructing service instances through stream-style processing; wxMaMessageRouter configures message handlers via chained rules, incorporating processing logic for message types such as logging, subscription messages, text/image/QR code, etc. All private handlers implement a unified message processing interface, utilizing WxMaService for message exchange and media file operations.
 
 ### Field List
 
 | Name  | Type  | Description |
 |-------|-------|------|
-| logHandler = (wxMessage, context, service, sessionManager) -> {        log.info("收到消息：" + wxMessage.toString());        service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("收到信息为：" + wxMessage.toJson())            .toUser(wxMessage.getFromUser()).build());        return null;    } | WxMaMessageHandler | Define a WeChat Mini Program message handler to log received messages and automatically reply with the user's message content. |
-| textHandler = (wxMessage, context, service, sessionManager) -> {        service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("回复文本消息")            .toUser(wxMessage.getFromUser()).build());        return null;    } | WxMaMessageHandler | WeChat Mini Program Message Handling: Automatically reply to text messages with a customer service message stating "Reply to text message," and return the message sender. |
-| subscribeMsgHandler = (wxMessage, context, service, sessionManager) -> {        service.getMsgService().sendSubscribeMsg(WxMaSubscribeMessage.builder()            .templateId("此处更换为自己的模板id")            .data(Lists.newArrayList(                new WxMaSubscribeMessage.MsgData("keyword1", "339208499")))            .toUser(wxMessage.getFromUser())            .build());        return null;    } | WxMaMessageHandler | WeChat Mini Program Subscription Message Handler Code: Sends subscription messages to users using template ID, including keywords and data. |
-| picHandler = (wxMessage, context, service, sessionManager) -> {        try {            WxMediaUploadResult uploadResult = service.getMediaService()                .uploadMedia("image", "png",                    ClassLoader.getSystemResourceAsStream("tmp.png"));            service.getMsgService().sendKefuMsg(                WxMaKefuMessage                    .newImageBuilder()                    .mediaId(uploadResult.getMediaId())                    .toUser(wxMessage.getFromUser())                    .build());        } catch (WxErrorException e) {            e.printStackTrace();        }        return null;    } | WxMaMessageHandler | Define a WeChat Mini Program image processor to upload temporary images and send customer service messages to users, printing errors when exceptions occur. |
-| properties | WxMaProperties | Privately immutable WeChat Mini Program configuration property object. |
-| qrcodeHandler = (wxMessage, context, service, sessionManager) -> {        try {            final File file = service.getQrcodeService().createQrcode("123", 430);            WxMediaUploadResult uploadResult = service.getMediaService().uploadMedia("image", file);            service.getMsgService().sendKefuMsg(                WxMaKefuMessage                    .newImageBuilder()                    .mediaId(uploadResult.getMediaId())                    .toUser(wxMessage.getFromUser())                    .build());        } catch (WxErrorException e) {            e.printStackTrace();        }        return null;    } | WxMaMessageHandler | Processing WeChat Mini Program messages, generating QR codes and uploading them as images, then sending them to users via customer service messages. Print errors in case of exceptions. |
+| properties | WxMaProperties | Private immutable WeChat Mini Program configuration property object. |
+| textHandler = (wxMessage, context, service, sessionManager) -> {        service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("回复文本消息")            .toUser(wxMessage.getFromUser()).build());        return null;    } | WxMaMessageHandler | WeChat Mini Program text message processing logic: Upon receiving a user message, automatically reply with a fixed text content and return it to the sender via the customer service interface. |
+| subscribeMsgHandler = (wxMessage, context, service, sessionManager) -> {        service.getMsgService().sendSubscribeMsg(WxMaSubscribeMessage.builder()            .templateId("此处更换为自己的模板id")            .data(Lists.newArrayList(                new WxMaSubscribeMessage.MsgData("keyword1", "339208499")))            .toUser(wxMessage.getFromUser())            .build());        return null;    } | WxMaMessageHandler | This code defines a WeChat Mini Program message handler for sending subscription messages. It constructs the message using a template ID and keyword data, then sends it to the specified user. The return value is null. |
+| picHandler = (wxMessage, context, service, sessionManager) -> {        try {            WxMediaUploadResult uploadResult = service.getMediaService()                .uploadMedia("image", "png",                    ClassLoader.getSystemResourceAsStream("tmp.png"));            service.getMsgService().sendKefuMsg(                WxMaKefuMessage                    .newImageBuilder()                    .mediaId(uploadResult.getMediaId())                    .toUser(wxMessage.getFromUser())                    .build());        } catch (WxErrorException e) {            e.printStackTrace();        }        return null;    } | WxMaMessageHandler | WeChat Mini Program image processing logic: Upload temporary images and send customer service messages, print errors in case of exceptions. |
+| logHandler = (wxMessage, context, service, sessionManager) -> {        log.info("收到消息：" + wxMessage.toString());        service.getMsgService().sendKefuMsg(WxMaKefuMessage.newTextBuilder().content("收到信息为：" + wxMessage.toJson())            .toUser(wxMessage.getFromUser()).build());        return null;    } | WxMaMessageHandler | Define WeChat Mini Program message handling logic: Record received message content and automatically reply to users, including the function of forwarding messages to customer service. |
+| qrcodeHandler = (wxMessage, context, service, sessionManager) -> {        try {            final File file = service.getQrcodeService().createQrcode("123", 430);            WxMediaUploadResult uploadResult = service.getMediaService().uploadMedia("image", file);            service.getMsgService().sendKefuMsg(                WxMaKefuMessage                    .newImageBuilder()                    .mediaId(uploadResult.getMediaId())                    .toUser(wxMessage.getFromUser())                    .build());        } catch (WxErrorException e) {            e.printStackTrace();        }        return null;    } | WxMaMessageHandler | Processing WeChat Mini Program QR Code Requests: Generate a QR code and upload it as an image message to send to the user, while printing error logs in case of exceptions. |
 
 ### Method List
 
 | Name  | Type  | Description |
 |-------|-------|------|
-| wxMaService | WxMaService | Create a WeChat Mini Program service instance, check the configuration, and initialize multi-account settings, including parameters such as appid and secret. If not configured, an exception will be thrown. |
-| wxMaMessageRouter | WxMaMessageRouter | Create a WeChat Mini Program message router, configuring synchronous handlers for subscription, text, image, and QR code messages. |
+| wxMaService | WxMaService | Create a WeChat Mini Program service instance, verify the configuration, initialize multi-account settings, configure parameters such as appid, and return the service instance. |
+| wxMaMessageRouter | WxMaMessageRouter | Create a WeChat Mini Program message router, configuring handlers for subscription, text, image, QR code, and other message types. |
 
 
 

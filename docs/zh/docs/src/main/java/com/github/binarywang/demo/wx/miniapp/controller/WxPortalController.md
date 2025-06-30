@@ -7,17 +7,17 @@
 | 代码路径 | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/controller/WxPortalController.java |
 | 包名 | com.github.binarywang.demo.wx.miniapp.controller |
 | 依赖项 | ['cn.binarywang.wx.miniapp.api.WxMaService', 'cn.binarywang.wx.miniapp.bean.WxMaMessage', 'cn.binarywang.wx.miniapp.constant.WxMaConstants', 'cn.binarywang.wx.miniapp.message.WxMaMessageRouter', 'cn.binarywang.wx.miniapp.util.WxMaConfigHolder', 'lombok.AllArgsConstructor', 'lombok.extern.slf4j.Slf4j', 'org.apache.commons.lang3.StringUtils', 'org.springframework.web.bind.annotation', 'java.util.Objects'] |
-| 概述说明 | 这是一个微信小程序后台控制器类，处理微信服务器的认证和消息请求。包含GET和POST方法，分别用于验证服务器和接收用户消息，支持明文和AES加密消息，验证签名后路由处理并返回响应。 |
+| 概述说明 | 微信小程序控制器类，处理GET/POST请求，验证签名并路由消息。GET用于认证，POST处理明文或AES加密消息，校验appid后转发消息并返回结果。每次请求后清理ThreadLocal。 |
 
 # 说明
 
-该代码定义了一个微信小程序门户控制器类，包含GET和POST两个请求处理方法。GET方法用于微信服务器认证，验证签名参数后返回echostr字符串。POST方法处理微信消息，支持明文和AES加密两种格式，根据配置转换为消息对象后路由处理，最后返回success。两个方法都会在结束时清理线程本地存储的配置。控制器通过路径变量appid区分不同小程序配置，若配置不存在则抛出异常。所有操作均记录详细日志。
+这是一个微信小程序后台控制器类，包含两个主要接口。GET接口用于微信服务器认证，验证签名参数后返回echostr字符串。POST接口处理微信消息请求，支持明文和AES加密两种格式，根据消息格式进行解析后路由处理，并返回success响应。两个接口都会检查appid有效性，并在处理完成后清理ThreadLocal存储的配置信息。
 
 # 类列表 Class Summary
 
 | 名称   | 类型  | 说明 |
 |-------|------|-------------|
-| WxPortalController | class | 微信小程序控制器，处理认证和消息请求，验证签名并路由消息，支持明文和AES加密消息。 |
+| WxPortalController | class | 微信小程序控制器，处理认证和消息请求，验证签名并路由消息，支持明文和AES加密，返回成功或错误信息。 |
 
 
 
@@ -28,7 +28,7 @@
 | 访问范围 | @RestController;@AllArgsConstructor;@RequestMapping("/wx/portal/{appid}");@Slf4j;public |
 | 类型 | class |
 | 名称 | WxPortalController |
-| 说明 | 微信小程序控制器，处理认证和消息请求，验证签名并路由消息，支持明文和AES加密消息。 |
+| 说明 | 微信小程序控制器，处理认证和消息请求，验证签名并路由消息，支持明文和AES加密，返回成功或错误信息。 |
 
 
 ### UML类图
@@ -55,7 +55,7 @@ classDiagram
     }
 
     class WxMaMessage {
-        <<Data Class>>
+        <<Interface>>
         +fromJson(String json) WxMaMessage
         +fromXml(String xml) WxMaMessage
         +fromEncryptedJson(String json, WxMaConfig config) WxMaMessage
@@ -63,31 +63,30 @@ classDiagram
     }
 
     class WxMaConfig {
-        <<Configuration Class>>
         +getMsgDataFormat() String
     }
 
-    class WxMaConstants {
-        <<Constants Class>>
-        +MsgDataFormat JSON
-        +MsgDataFormat XML
+    class WxMaConfigHolder {
+        +remove() void
     }
 
-    class WxMaConfigHolder {
-        <<Utility Class>>
-        +remove() void
+    class WxMaConstants {
+        <<Enumeration>>
+        +MsgDataFormat JSON
+        +MsgDataFormat XML
     }
 
     WxPortalController --> WxMaService : 依赖
     WxPortalController --> WxMaMessageRouter : 依赖
     WxMaMessageRouter --> WxMaMessage : 处理
+    WxMaService --> WxMaConfig : 获取配置
     WxMaMessage --> WxMaConfig : 依赖
-    WxMaService --> WxMaConfig : 配置
-    WxMaService --> WxMaConstants : 引用常量
     WxPortalController --> WxMaConfigHolder : 清理ThreadLocal
+    WxMaService --> WxMaConstants : 使用枚举
 ```
 
-这段代码展示了一个微信小程序后台控制器(WxPortalController)，主要处理微信服务器的认证和消息推送请求。类图清晰地呈现了控制器与WxMaService服务接口、WxMaMessageRouter路由器的依赖关系，以及消息处理过程中涉及的WxMaMessage数据类、WxMaConfig配置类和工具类WxMaConfigHolder。控制器提供authGet和post两个核心方法，分别处理GET验证请求和POST消息推送，通过WxMaService进行签名验证和配置切换，并最终通过WxMaMessageRouter路由处理消息。整个设计体现了清晰的职责划分和模块化思想。
+类图描述：
+该图展示了一个微信小程序门户控制器(WxPortalController)的核心结构，它通过WxMaService处理微信服务器认证和消息加解密，使用WxMaMessageRouter路由消息。控制器包含GET/POST两个公开方法，分别处理验证请求和消息推送，依赖WxMaConfigHolder管理线程局部变量。系统采用接口隔离原则，WxMaService和WxMaMessage为关键接口，支持JSON/XML两种数据格式，通过WxMaConstants枚举维护常量。整体架构体现了清晰的职责划分和模块化设计。
 
 
 ### 内部方法调用关系图
@@ -95,9 +94,9 @@ classDiagram
 ```mermaid
 graph TD
     A["WxPortalController类"]
-    B["GET认证请求: authGet"]
+    B["GET认证流程: authGet"]
     C["POST消息处理: post"]
-    D["内部路由方法: route"]
+    D["路由方法: route"]
     E["依赖服务: wxMaService"]
     F["依赖路由: wxMaMessageRouter"]
 
@@ -107,22 +106,26 @@ graph TD
     A --> E
     A --> F
 
-    B --> B1["检查参数完整性"]
-    B --> B2["切换appid配置"]
-    B --> B3["验证签名"]
-    B --> B4["返回echostr或错误"]
-    B --> B5["清理ThreadLocal"]
+    B --> B1["记录请求日志"]
+    B --> B2{"参数校验"}
+    B2 -->|非法| B3["抛出异常"]
+    B2 -->|合法| B4{"切换appid配置"}
+    B4 -->|失败| B5["抛出异常"]
+    B4 -->|成功| B6{"验证签名"}
+    B6 -->|有效| B7["返回echostr"]
+    B6 -->|无效| B8["返回'非法请求'"]
+    B7 & B8 --> B9["清理ThreadLocal"]
 
-    C --> C1["检查appid配置"]
-    C --> C2["判断消息格式"]
-    C --> C3["处理明文消息"]
-    C --> C4["处理AES加密消息"]
-    C --> C5["路由消息"]
-    C --> C6["清理ThreadLocal"]
-    C --> C7["返回success或错误"]
-
-    D --> D1["调用wxMaMessageRouter.route"]
-    D --> D2["异常处理"]
+    C --> C1["记录请求日志"]
+    C --> C2{"切换appid配置"}
+    C2 -->|失败| C3["抛出异常"]
+    C2 -->|成功| C4{"加密类型判断"}
+    C4 -->|明文| C5["解析JSON/XML"]
+    C4 -->|aes加密| C6["解密JSON/XML"]
+    C4 -->|其他| C7["抛出异常"]
+    C5 & C6 --> C8["路由消息"]
+    C8 --> C9["返回'success'"]
+    C9 & C7 --> C10["清理ThreadLocal"]
 ```
 
 ```mermaid
@@ -133,60 +136,64 @@ sequenceDiagram
     participant Router as wxMaMessageRouter
 
     Note over Client,Router: GET认证流程
-    Client->>Controller: GET请求(signature/timestamp/nonce/echostr)
-    Controller->>Service: switchover(appid)
-    alt 配置不存在
-        Service-->>Controller: false
-        Controller-->>Client: 返回错误
-    else 配置存在
-        Service-->>Controller: true
-        Controller->>Service: checkSignature(...)
-        alt 签名有效
-            Service-->>Controller: true
-            Controller-->>Client: 返回echostr
-        else 签名无效
-            Service-->>Controller: false
-            Controller-->>Client: 返回"非法请求"
+    Client->>Controller: GET请求携带参数
+    Controller->>Controller: 记录日志
+    Controller->>Controller: 参数校验
+    alt 参数非法
+        Controller-->>Client: 抛出异常
+    else 参数合法
+        Controller->>Service: switchover(appid)
+        alt 配置不存在
+            Controller-->>Client: 抛出异常
+        else 配置存在
+            Controller->>Service: checkSignature()
+            alt 签名有效
+                Controller-->>Client: 返回echostr
+            else 签名无效
+                Controller-->>Client: 返回'非法请求'
+            end
         end
     end
+    Controller->>Controller: 清理ThreadLocal
 
-    Note over Client,Router: POST消息流程
-    Client->>Controller: POST请求(消息体+参数)
+    Note over Client,Router: POST消息处理
+    Client->>Controller: POST请求携带参数
+    Controller->>Controller: 记录日志
     Controller->>Service: switchover(appid)
     alt 配置不存在
-        Service-->>Controller: false
-        Controller-->>Client: 返回错误
+        Controller-->>Client: 抛出异常
     else 配置存在
-        Service-->>Controller: true
         alt 明文消息
-            Controller->>Controller: 解析XML/JSON
+            Controller->>Controller: 解析JSON/XML
             Controller->>Router: route(message)
-            Controller-->>Client: 返回"success"
-        else AES加密消息
-            Controller->>Service: 获取配置
-            Controller->>Controller: 解密消息
+            Controller-->>Client: 返回'success'
+        else aes加密消息
+            Controller->>Controller: 解密JSON/XML
             Controller->>Router: route(message)
-            Controller-->>Client: 返回"success"
+            Controller-->>Client: 返回'success'
+        else 未知加密类型
+            Controller-->>Client: 抛出异常
         end
     end
+    Controller->>Controller: 清理ThreadLocal
 ```
 
-该流程图展示了微信小程序消息控制器WxPortalController的核心处理逻辑，包含GET请求的微信服务器认证和POST消息处理两大流程。GET流程通过签名验证确保请求合法性，POST流程根据加密类型分别处理明文和AES加密消息，最终通过消息路由器进行业务分发。两个流程都包含ThreadLocal清理机制，体现了完整的请求生命周期管理。时序图则详细呈现了客户端与服务端交互时各组件间的调用顺序和条件分支。
+该流程图和时序图展示了微信小程序后台控制器的完整处理逻辑。GET认证流程包含参数校验、配置切换和签名验证三个关键阶段，POST消息处理则区分明文和加密两种消息类型进行不同处理。两个流程都包含ThreadLocal清理机制，确保线程安全。时序图清晰呈现了客户端、控制器、服务组件之间的交互顺序和条件分支，完整覆盖了微信消息推送的认证和消息处理场景。
 
 ### 字段列表 Field List
 
 | 名称  | 类型  | 说明 |
 |-------|-------|------|
-| wxMaMessageRouter | WxMaMessageRouter | 微信小程序消息路由对象，用于处理消息。 |
-| wxMaService | WxMaService | 微信小程序服务实例（私有不可变） |
+| wxMaService | WxMaService | 微信小程序服务实例，私有不可变。 |
+| wxMaMessageRouter | WxMaMessageRouter | 微信小程序消息路由器的私有不可变实例。 |
 
 ### 方法列表
 
 | 名称  | 类型  | 说明 |
 |-------|-------|------|
-| post | String | 处理微信XML/JSON请求，支持明文和AES加密消息，验证appid后路由消息并返回成功响应。 |
-| authGet | String | 处理微信认证请求，验证参数和签名，返回echostr或错误信息。 |
-| route | void | 私有方法route接收WxMaMessage消息，调用wxMaMessageRouter.route处理，异常时记录错误日志。 |
+| route | void | 方法route处理微信消息，调用路由功能并捕获异常记录日志。 |
+| post | String | 处理微信请求的POST接口，验证appid并解析明文或AES加密的XML/JSON消息，处理后返回success，异常时清理ThreadLocal并报错。 |
+| authGet | String | 这是一个处理微信服务器认证请求的GET接口，验证签名参数后返回echostr或错误信息。 |
 
 
 

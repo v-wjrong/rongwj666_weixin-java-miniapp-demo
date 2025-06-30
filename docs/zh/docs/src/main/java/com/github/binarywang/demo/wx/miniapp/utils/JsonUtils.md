@@ -7,17 +7,17 @@
 | 代码路径 | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/utils/JsonUtils.java |
 | 包名 | com.github.binarywang.demo.wx.miniapp.utils |
 | 依赖项 | ['com.fasterxml.jackson.annotation.JsonInclude.Include', 'com.fasterxml.jackson.core.JsonProcessingException', 'com.fasterxml.jackson.databind.ObjectMapper', 'com.fasterxml.jackson.databind.SerializationFeature'] |
-| 概述说明 | JsonUtils工具类，使用ObjectMapper配置非NULL字段序列化和格式化输出，提供toJson方法将对象转为JSON字符串，异常时返回null。 |
+| 概述说明 | JsonUtils类提供静态JSON序列化方法，使用ObjectMapper配置忽略null值并格式化输出，异常时返回null。 |
 
 # 说明
 
-JsonUtils是一个工具类，用于处理JSON序列化。它使用ObjectMapper进行配置，静态初始化时设置序列化规则为排除空值字段，并启用格式化输出。提供了toJson方法将对象转为JSON字符串，内部调用writeValueAsString方法。若转换失败会打印异常并返回null。
+JsonUtils是一个工具类，用于处理JSON序列化。它使用ObjectMapper作为核心组件，并在静态初始化块中配置了两个关键选项：一是设置序列化时忽略null值，二是启用缩进输出以提高可读性。该类提供了一个静态方法toJson，用于将任意对象转换为JSON字符串。若转换过程中发生JsonProcessingException异常，会打印异常堆栈并返回null。整个类设计简洁，专注于JSON序列化的基础功能。
 
 # 类列表 Class Summary
 
 | 名称   | 类型  | 说明 |
 |-------|------|-------------|
-| JsonUtils | class | JsonUtils类提供静态方法toJson，使用ObjectMapper将对象转为JSON字符串，自动忽略null值并格式化输出，异常时返回null。 |
+| JsonUtils | class | JsonUtils类提供静态JSON序列化方法，使用ObjectMapper配置非空字段输出和格式化，异常时返回null。 |
 
 
 
@@ -28,7 +28,7 @@ JsonUtils是一个工具类，用于处理JSON序列化。它使用ObjectMapper�
 | 访问范围 | public |
 | 类型 | class |
 | 名称 | JsonUtils |
-| 说明 | JsonUtils类提供静态方法toJson，使用ObjectMapper将对象转为JSON字符串，自动忽略null值并格式化输出，异常时返回null。 |
+| 说明 | JsonUtils类提供静态JSON序列化方法，使用ObjectMapper配置非空字段输出和格式化，异常时返回null。 |
 
 
 ### UML类图
@@ -42,28 +42,14 @@ classDiagram
 
     class ObjectMapper {
         +setSerializationInclusion(Include inclusion)
-        +configure(SerializationFeature feature, Boolean value)
+        +configure(SerializationFeature feature, Boolean enabled)
         +String writeValueAsString(Object value) throws JsonProcessingException
     }
 
-    class Include {
-        <<enumeration>>
-        NON_NULL
-        // other enum values...
-    }
-
-    class SerializationFeature {
-        <<enumeration>>
-        INDENT_OUTPUT
-        // other enum values...
-    }
-
-    JsonUtils --> ObjectMapper : 使用
-    ObjectMapper --> Include : 配置
-    ObjectMapper --> SerializationFeature : 配置
+    JsonUtils --> ObjectMapper : 依赖
 ```
 
-这段类图展示了JsonUtils工具类与Jackson库核心组件的关系。JsonUtils通过静态ObjectMapper实例提供JSON序列化功能，配置了非空值过滤和缩进输出特性。ObjectMapper依赖于枚举类Include和SerializationFeature来实现序列化配置。该设计封装了JSON处理的复杂性，但异常处理直接打印堆栈可能不够完善，适合简单场景使用。
+类图描述：该图展示了一个JsonUtils工具类，它封装了Jackson库的ObjectMapper对象用于JSON序列化操作。JsonUtils通过静态初始化块配置ObjectMapper实例（忽略NULL值、启用缩进输出），并提供了toJson()方法将对象转换为JSON字符串。ObjectMapper类展示了关键的配置和序列化方法，两者之间存在明确的依赖关系。
 
 
 ### 内部方法调用关系图
@@ -71,14 +57,14 @@ classDiagram
 ```mermaid
 graph TD
     A["类JsonUtils"]
-    B["静态常量: ObjectMapper JSON"]
+    B["静态属性: ObjectMapper JSON"]
     C["静态初始化块"]
-    D["设置JSON序列化包含策略: NON_NULL"]
-    E["配置JSON输出缩进: INDENT_OUTPUT"]
+    D["设置: JSON.setSerializationInclusion(Include.NON_NULL)"]
+    E["配置: JSON.configure(SerializationFeature.INDENT_OUTPUT, true)"]
     F["静态方法: String toJson(Object obj)"]
-    G["执行JSON序列化: writeValueAsString"]
-    H["捕获异常: JsonProcessingException"]
-    I["返回null"]
+    G["执行: JSON.writeValueAsString(obj)"]
+    H["异常处理: catch JsonProcessingException"]
+    I["返回: null"]
 
     A --> B
     A --> C
@@ -86,24 +72,24 @@ graph TD
     C --> E
     A --> F
     F --> G
-    G -->|成功| F
-    G -->|失败| H
+    G -->|异常| H
+    G -->|正常| F
     H --> I
 ```
 
-该流程图展示了JsonUtils工具类的核心结构，包含静态初始化块配置ObjectMapper实例，以及toJson方法的执行流程。静态初始化阶段设置非空值序列化和缩进输出，toJson方法尝试将对象转为JSON字符串，失败时打印异常并返回null。整个设计体现了JSON处理的健壮性和配置灵活性。
+流程图描述了JsonUtils工具类的结构和执行流程。该类通过静态初始化块配置ObjectMapper实例，设置非空值序列化和缩进输出。核心方法toJson()通过writeValueAsString转换对象为JSON字符串，异常时返回null。整体展现了从类初始化到方法调用的完整路径，突出异常处理分支。
 
 ### 字段列表 Field List
 
 | 名称  | 类型  | 说明 |
 |-------|-------|------|
-| JSON = new ObjectMapper() | ObjectMapper | 创建静态不可变的JSON对象映射器实例。 |
+| JSON = new ObjectMapper() | ObjectMapper | 定义私有静态不可变JSON对象映射器实例。 |
 
 ### 方法列表
 
 | 名称  | 类型  | 说明 |
 |-------|-------|------|
-| toJson | String | 静态方法toJson将对象转为JSON字符串，失败时打印异常并返回null。 |
+| toJson | String | 将对象转为JSON字符串，失败返回null。 |
 
 
 

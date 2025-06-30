@@ -6,35 +6,34 @@
 | Language | .java |
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/controller |
 | Package Name | docs.src.main.java.com.github.binarywang.demo.wx.miniapp.controller |
-| Brief Description | WeChat Mini Program Controller Classes: The Media Controller handles file uploads and downloads; the User Controller manages login, user information, and phone numbers; the Portal Controller handles WeChat server authentication and message routing. All include thread-safe cleanup and exception handling. |
+| Brief Description | The three controller classes in the WeChat Mini Program: the Media Management class handles file uploads and downloads; the User Management class provides interfaces for login, user information, and phone numbers; the Backend class handles WeChat server authentication and message routing. All classes validate the appid and clean up ThreadLocal. |
 
 # Description
 
 ## Overview  
-This module serves as the core controller for the WeChat Mini Program backend, providing three major functionalities: media management, user services, and message gateway. It employs ThreadLocal to ensure thread safety, validates the appid for all interfaces, and automatically cleans up resources. Key data structures include MediaId lists, user session information (sessionKey/openid), and WeChat message objects. It relies on WeChat server APIs for operations such as media upload/download and user information decryption. For example, the media controller handles temporary materials, the user controller decrypts sensitive data, and the gateway controller verifies message signatures.  
+This module is a collection of core backend controllers for WeChat Mini Programs, primarily responsible for three major functions: media file management, user session management, and interaction with the WeChat server. The interface specifications uniformly require validation of appid validity and cleanup of configuration information stored in ThreadLocal after processing. Key data structures include media_id (media identifier), user session information objects, and WeChat message encapsulation bodies. External dependencies include the WeChat Open Platform SDK and the Lombok utility library. For example, the media controller handles multi-file uploads and returns a list of media_ids, while the user controller decrypts and returns mobile phone number information.  
 
-## Key Business Scenarios  
-Media management supports batch upload and download of temporary files, similar to a CDN relay service. User services implement a login chain via code, decrypting sensitive information (e.g., phone numbers) after validation. The message gateway adopts duplex communication, with GET completing server authentication and POST handling encrypted/plaintext message routing. A typical workflow includes: user login → fetching information → uploading media → receiving messages. API types encompass RESTful interfaces and WeChat callback interfaces, such as distinguishing multi-tenant configurations by appid and returning standardized errors in case of exceptions.
+## Main Business Scenarios  
+The module supports three typical types of interactions: media file upload/download (similar to cloud storage interfaces), user authentication processes (similar to OAuth2.0), and WeChat server message routing (similar to an event bus pattern). The complete business process consists of three stages: credential verification → business processing → resource cleanup. For example, during user login, the code is verified and the openid is returned. Integration use cases cover file transfer, session management, and message push, such as processing encrypted WeChat messages via a POST interface and returning a "success" response.
 
 
 ### Package Internal Structure View
 
 ```mermaid
 graph TD
-    miniapp --> controller
     controller --> WxMaMediaController.java
     controller --> WxMaUserController.java
     controller --> WxPortalController.java
 ```
 
-This flowchart illustrates the controller module structure of a WeChat Mini Program demo project. The top-level node is miniapp, which contains the controller directory. Within the controller directory, there are three Java controller files: WxMaMediaController, WxMaUserController, and WxPortalController, handling media, user, and portal-related functionalities respectively.
+This flowchart illustrates the structure of three controller files within the controller directory of a WeChat Mini Program demo project. The top-level node represents the controller folder, which directly contains three Java controller class files: WxMaMediaController, WxMaUserController, and WxPortalController. These handle the business logic for media management, user management, and portal requests respectively.
 
 # File List
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| [WxMaMediaController.java](WxMaMediaController.md) | file | WeChat Mini Program media controller, providing functionality for uploading and downloading temporary materials. Upload requires appid verification, supports multi-file processing, and returns a media_id list. Download requires verification of both appid and media_id, returning the media file. Clears ThreadLocal after operations. |
-| [WxMaUserController.java](WxMaUserController.md) | file | WeChat Mini Program User Controller, providing interfaces for login, retrieving user information, and phone number. It requires validation of appid and parameters, returns JSON data, handles exceptions, and cleans up ThreadLocal. |
-| [WxPortalController.java](WxPortalController.md) | file | This is a WeChat Mini Program backend controller class that handles authentication and message requests from the WeChat server. It includes GET and POST methods, used for server verification and receiving user messages respectively, supporting plaintext and AES-encrypted messages. After signature verification, it routes the processing and returns a response. |
+| [WxMaMediaController.java](WxMaMediaController.md) | file | WeChat Mini Program Material Controller, providing upload and download functions for temporary materials. Upload returns a list of media_ids, download returns files. Requires validation of appid validity and cleans up ThreadLocal after operations. |
+| [WxMaUserController.java](WxMaUserController.md) | file | WeChat Mini Program User Controller, providing interfaces for login, retrieving user information and phone number, verifying appid and user data, returning JSON results, and cleaning up ThreadLocal. |
+| [WxPortalController.java](WxPortalController.md) | file | WeChat Mini Program controller class, handling GET/POST requests, verifying signatures, and routing messages. GET is used for authentication, while POST processes plaintext or AES-encrypted messages, forwards them after validating the appid, and returns the result. Clears ThreadLocal after each request. |
 
 
