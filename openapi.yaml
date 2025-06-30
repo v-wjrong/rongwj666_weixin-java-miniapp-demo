@@ -1,0 +1,233 @@
+openapi: 3.0.0
+info:
+  title: binary/weixin-java-miniapp-demo
+  version: 1.0.0
+  description: binary/weixin-java-miniapp-demo
+servers:
+- url: http://localhost:8080
+  description: Local development server
+paths:
+  /wx/media/{appid}/upload:
+    post:
+      tags:
+      - WxMaMediaController
+      summary: uploadMedia
+      description: ''
+      operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaMediaController#uploadMedia
+      parameters:
+      - in: path
+        name: appid
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+      deprecated: false
+  /wx/media/{appid}/download/{mediaId}:
+    get:
+      tags:
+      - WxMaMediaController
+      summary: getMedia
+      description: ''
+      operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaMediaController#getMedia
+      parameters:
+      - in: path
+        name: appid
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: mediaId
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+      deprecated: false
+  /wx/user/{appid}/login:
+    get:
+      tags:
+      - WxMaUserController
+      summary: login
+      description: ''
+      operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaUserController#login
+      parameters:
+      - in: path
+        name: appid
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+      deprecated: false
+  /wx/user/{appid}/info:
+    get:
+      tags:
+      - WxMaUserController
+      summary: info
+      description: ''
+      operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaUserController#info
+      parameters:
+      - in: query
+        name: code
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: appid
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+      deprecated: false
+  /wx/user/{appid}/phone:
+    get:
+      tags:
+      - WxMaUserController
+      summary: phone
+      description: ''
+      operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaUserController#phone
+      parameters:
+      - in: path
+        name: appid
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+      deprecated: false
+  /wx/portal/{appid}:
+    get:
+      tags:
+      - WxPortalController
+      summary: authGet
+      description: ''
+      operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxPortalController#authGet
+      parameters:
+      - in: query
+        name: sessionKey
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: appid
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+      deprecated: false
+    post:
+      tags:
+      - WxPortalController
+      summary: post
+      description: ''
+      operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxPortalController#post
+      parameters:
+      - in: query
+        name: signature
+        required: true
+        description: ''
+        schema:
+          type: string
+      - in: path
+        name: appid
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+      deprecated: false
+  /error/404:
+    get:
+      tags:
+      - ErrorController
+      summary: error404
+      description: ''
+      operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.error.ErrorController#error404
+      parameters:
+      - in: query
+        name: rawData
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+      deprecated: false
+  /error/500:
+    get:
+      tags:
+      - ErrorController
+      summary: error500
+      description: ''
+      operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.error.ErrorController#error500
+      parameters:
+      - in: query
+        name: encryptedData
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+      deprecated: false
+components: {}
