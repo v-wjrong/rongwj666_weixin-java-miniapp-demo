@@ -12,7 +12,7 @@ paths:
       tags:
       - WxMaMediaController
       summary: uploadMedia
-      description: ''
+      description: 上传媒体文件接口，校验appid后处理多文件上传，返回微信媒体ID列表。异常时记录日志并清理线程变量。
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaMediaController#uploadMedia
       parameters:
       - in: path
@@ -36,17 +36,17 @@ paths:
       tags:
       - WxMaMediaController
       summary: getMedia
-      description: ''
+      description: 这是一个基于Spring框架的GET接口，用于下载媒体文件。接口接收appid和mediaId参数，验证配置后返回媒体文件，并清理ThreadLocal。
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaMediaController#getMedia
       parameters:
-      - in: path
-        name: appid
+      - in: query
+        name: sysJobLog
         required: true
         description: ''
         schema:
-          type: string
+          type: object
       - in: path
-        name: mediaId
+        name: appid
         required: true
         description: ''
         schema:
@@ -64,7 +64,7 @@ paths:
       tags:
       - WxMaUserController
       summary: login
-      description: ''
+      description: 这是一个微信小程序登录接口，通过code获取用户session信息。验证code和appid后返回session数据，异常时记录错误并清理ThreadLocal。
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaUserController#login
       parameters:
       - in: path
@@ -86,11 +86,11 @@ paths:
       tags:
       - WxMaUserController
       summary: info
-      description: ''
+      description: 这是一个微信小程序后端接口，用于验证用户信息并解密返回用户数据。首先检查appid配置，然后校验用户信息签名，最后解密数据并返回JSON格式的用户信息。
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaUserController#info
       parameters:
       - in: query
-        name: code
+        name: jobGroup
         required: true
         description: ''
         schema:
@@ -114,7 +114,7 @@ paths:
       tags:
       - WxMaUserController
       summary: phone
-      description: ''
+      description: 这是一个微信小程序获取用户手机号的接口，校验appid和用户信息后解密返回手机号数据。
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaUserController#phone
       parameters:
       - in: path
@@ -136,15 +136,9 @@ paths:
       tags:
       - WxPortalController
       summary: authGet
-      description: ''
+      description: 这是一个微信认证接口，接收微信服务器的验证请求，校验参数和签名后返回响应字符串。若参数缺失或签名不合法则抛出异常或返回非法请求提示。
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxPortalController#authGet
       parameters:
-      - in: query
-        name: sessionKey
-        required: true
-        description: ''
-        schema:
-          type: string
       - in: path
         name: appid
         required: true
@@ -163,15 +157,15 @@ paths:
       tags:
       - WxPortalController
       summary: post
-      description: ''
+      description: 处理微信请求的接口，支持明文和AES加密消息，验证appid后根据消息格式（JSON/XML）解析并路由，最后清理线程数据返回成功或错误。
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxPortalController#post
       parameters:
       - in: query
-        name: signature
+        name: sysJobLog
         required: true
         description: ''
         schema:
-          type: string
+          type: object
       - in: path
         name: appid
         required: true
@@ -191,15 +185,8 @@ paths:
       tags:
       - ErrorController
       summary: error404
-      description: ''
+      description: Spring MVC控制器方法，处理GET请求路径"/404"，返回字符串"error"。
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.error.ErrorController#error404
-      parameters:
-      - in: query
-        name: rawData
-        required: true
-        description: ''
-        schema:
-          type: string
       responses:
         '200':
           description: Success
@@ -213,15 +200,8 @@ paths:
       tags:
       - ErrorController
       summary: error500
-      description: ''
+      description: Spring MVC接口，GET请求路径"/500"，返回字符串"error"。
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.error.ErrorController#error500
-      parameters:
-      - in: query
-        name: encryptedData
-        required: true
-        description: ''
-        schema:
-          type: string
       responses:
         '200':
           description: Success

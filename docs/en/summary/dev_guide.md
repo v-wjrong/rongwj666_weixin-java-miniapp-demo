@@ -9,10 +9,10 @@
 - **Primary Programming Language:** Java  
 
 ## Prerequisites  
-- **JDK Version:** 1.8 (based on Maven's `<maven.compiler.source>` and `<maven.compiler.target>` properties)  
-- **Build Tool Version:** Maven (identified from the `pom.xml` file)  
+- **JDK Version:** 1.8 (inferred from Maven's `<maven.compiler.source>` and `<maven.compiler.target>` properties)  
+- **Build Tool Version:** Maven (identified from the `pom.xml` file; no explicit Maven version specified; recommended to use a version compatible with Spring Boot 2.6.3)  
 - **Network Middleware Dependencies:**  
-  - Redis (inferred from the `jedis` dependency, but no explicit version specified)  
+  - Redis (inferred from the `jedis` dependency; no explicit version specified)  
 
 ## Build Guide  
 ### Maven Build  
@@ -23,26 +23,28 @@
     - Install to local repository: `mvn install`  
     - Deploy project: `mvn deploy`  
 - Build Process:  
-    - Maven's build process mainly includes phases such as clean, compile, test, package, verify, install, and deploy. This project uses Spring Boot and Docker plugins. After packaging, an executable JAR file will be generated, and Docker image building is supported.  
+    The Maven build process mainly includes the following phases:  
+    1. **Clean (clean):** Deletes the `target` directory and generated build files.  
+    2. **Compile (compile):** Compiles the project's source code.  
+    3. **Test (test):** Executes unit tests.  
+    4. **Package (package):** Packages the compiled code into a JAR or WAR file.  
+    5. **Verify (verify):** Checks the packaged results to ensure quality.  
+    6. **Install (install):** Installs the packaged file into the local Maven repository.  
+    7. **Deploy (deploy):** Deploys the packaged file to a remote Maven repository.  
 - Output Directory:  
-    - The packaged JAR file is located in the `target/` directory, named `${project.build.finalName}.jar` (e.g., `weixin-java-miniapp-demo-1.0.0-SNAPSHOT.jar`).  
-    - If using the Docker plugin to build the image, Docker-related files should be placed in the `src/main/docker/` directory. The built image name is `${docker.image.prefix}/${project.artifactId}` (e.g., `wx-miniapp-demo/weixin-java-miniapp-demo`).  
+    - The packaged file (e.g., JAR or WAR) is generated in the `target/` directory.  
+    - Example: `target/weixin-java-miniapp-demo-1.0.0-SNAPSHOT.jar`.  
+    - If the Docker plugin is used, Docker-related files are placed in the `src/main/docker/` directory.  
 
 ## Dependency Management  
-### Main Dependencies  
-- **Spring Boot Core Dependencies:**  
-  - `spring-boot-starter-web`: Web application support (version inherited from parent POM 2.6.3)  
-  - `spring-boot-starter-thymeleaf`: Thymeleaf template engine integration  
-  - `spring-boot-starter-test`: Test support (scope=test)  
-  - `spring-boot-configuration-processor`: Configuration metadata generation (optional=true)  
-
-- **WeChat Mini Program SDK:**  
-  - `weixin-java-miniapp`: WeChat Mini Program Java SDK (version managed by property `${weixin-java-miniapp.version}`, currently 4.7.0)  
-
-- **Utility Libraries:**  
-  - `commons-fileupload`: File upload functionality (explicitly specified version 1.5)  
-  - `lombok`: Code simplification tool (scope=provided)  
-  - `jedis`: Redis client (version inherited from parent POM)  
+### Key Dependencies  
+- **Spring Boot Web:** `spring-boot-starter-web` - Provides Spring MVC and embedded Tomcat support (version inherited from parent POM 2.6.3).  
+- **Thymeleaf:** `spring-boot-starter-thymeleaf` - Template engine support (version inherited from parent POM).  
+- **WeChat Mini Program SDK:** `weixin-java-miniapp:4.7.0` - WeChat Mini Program Java SDK (managed via the `weixin-java-miniapp.version` property).  
+- **File Upload:** `commons-fileupload:1.5` - Apache Commons file upload component.  
+- **Testing:** `spring-boot-starter-test` - Spring Boot testing support (scope: test).  
+- **Lombok:** `lombok` - Annotation-driven code generation tool (scope: provided).  
+- **Redis Client:** `jedis` - Redis Java client (version inherited from parent POM).  
 
 ### Adding/Modifying Dependencies  
 - **Maven:** Add or modify `<dependency>` elements within the `<dependencies>` tag in the `pom.xml` file. For example:  
@@ -56,26 +58,23 @@
 
 ### Dependency Version Management  
 - **Maven (`<dependencyManagement>`):**  
-  1. Most Spring Boot-related dependency versions are uniformly managed via the parent POM (`spring-boot-starter-parent`).  
-  2. Custom properties manage specific dependency versions (e.g., `<weixin-java-miniapp.version>4.7.0</weixin-java-miniapp.version>`).  
-  3. Explicitly declaring the `<version>` tag overrides inherited versions (e.g., `commons-fileupload`).  
-  4. If no version is specified, versions are automatically inherited from the parent POM or dependency management section.
+  This POM centrally manages most dependency versions through the parent POM (`spring-boot-starter-parent:2.6.3`). Custom versions can be overridden via `<properties>` (e.g., `weixin-java-miniapp.version`) or by directly specifying `<version>`. To uniformly manage submodule dependencies, use `<dependencyManagement>` in the parent POM to define versions without introducing dependencies.
 
 ## Project Structure
 
 ```text
 weixin-java-miniapp-demo/
-├── .editorconfig        # Editor configuration (standardized settings)
-├── .gitignore          # Git ignore rules
-├── README.md           # Project documentation
-├── .travis.yml         # CI/CD configuration (Travis CI)
-├── pom.xml             # Maven project configuration file
-├── commit.sh           # Git commit script (presumed)
+├── .editorconfig       # Editor configuration (standardized settings)
+├── .gitignore         # Git ignore rules
+├── README.md          # Project documentation
+├── .travis.yml        # CI/CD configuration (Travis CI)
+├── pom.xml            # Maven project configuration file
+├── commit.sh          # Git commit script (inferred)
 ├── src/
 │   └── main/
 │       ├── resources/
 │       │   ├── application.yml.template  # Spring Boot configuration template
-│       │   ├── tmp.png                   # Temporary image resource (presumed)
+│       │   ├── tmp.png                   # Temporary image resource (inferred)
 │       │   ├── templates/
 │       │   │   └── error.html           # Error page template
 │       │   └── META-INF/
@@ -83,37 +82,36 @@ weixin-java-miniapp-demo/
 │       ├── java/
 │       │   └── com/github/binarywang/demo/wx/miniapp/
 │       │       ├── WxMaDemoApplication.java  # Spring Boot main class
-│       │       ├── controller/
-│       │       │   ├── WxMaMediaController.java  # WeChat media API controller
-│       │       │   ├── WxMaUserController.java   # WeChat user API controller
-│       │       │   └── WxPortalController.java   # WeChat entry controller
-│       │       ├── utils/
-│       │       │   └── JsonUtils.java      # JSON utility class
-│       │       ├── error/
-│       │       │   ├── ErrorController.java       # Error handling controller
+│       │       ├── controller/               # WeChat Mini Program controllers
+│       │       │   ├── WxMaMediaController.java   # Media processing controller
+│       │       │   ├── WxMaUserController.java    # User management controller
+│       │       │   └── WxPortalController.java    # Entry controller
+│       │       ├── utils/                    # Utility classes
+│       │       │   └── JsonUtils.java        # JSON processing utility
+│       │       ├── error/                    # Error handling module
+│       │       │   ├── ErrorController.java      # Global error controller
 │       │       │   └── ErrorPageConfiguration.java  # Error page configuration
-│       │       └── config/
-│       │           ├── WxMaProperties.java    # WeChat Mini Program configuration properties
-│       │           └── WxMaConfiguration.java # WeChat Mini Program configuration class
+│       │       └── config/                   # WeChat configuration module
+│       │           ├── WxMaProperties.java       # WeChat configuration properties
+│       │           └── WxMaConfiguration.java    # WeChat configuration class
 │       └── docker/
-│           └── Dockerfile  # Container deployment configuration
-└── .github/
-    └── FUNDING.yml         # GitHub sponsorship configuration
+│           └── Dockerfile                # Container deployment configuration
+├── .git/                                # Git version control directory (standard VCS structure)
+└── .github/                             # GitHub platform configuration
+    └── FUNDING.yml                      # GitHub sponsorship configuration
 ```
 
-Naming convention: Standard Java package naming (com.github.organization.project), directories use lowercase kebab-case (e.g., miniapp)
+Naming conventions: Follows Java standard package naming (com.github.organization), directories use lowercase kebab-case (e.g., miniapp-demo)
 
-Layered structure:
-1. Controller layer: `controller` package handles WeChat API requests
-2. Utility layer: `utils` package provides JSON serialization capabilities
-3. Configuration layer: `config` package manages WeChat SDK settings
-4. Error handling: Dedicated `error` package for global exception handling
-5. Resource layer: `resources` directory contains static assets and templates
+Layered architecture:
+1. Controller layer: Handles WeChat API requests
+2. Configuration layer: Manages WeChat SDK configurations
+3. Utility layer: Provides JSON serialization capabilities
+4. Error handling layer: Implements global exception interception
+5. Resource layer: Contains static templates and configurations
 
 Extension design:
-1. Containerization support via dedicated `docker` directory
-2. Configuration template mechanism (application.yml.template)
-3. Comprehensive error handling system (error controller + page template)
-4. CI/CD integration (.travis.yml)
-5. Standardized Spring configuration metadata (META-INF)
-```
+1. Supports containerized deployment via dedicated docker directory
+2. Configuration template (application.yml.template) enables environment isolation
+3. .travis.yml provides CI extension points
+4. META-INF supports Spring Boot configuration extensions

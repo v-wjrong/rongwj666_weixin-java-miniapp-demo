@@ -7,11 +7,11 @@
 | 代码路径 | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/WxMaDemoApplication.java |
 | 包名 | com.github.binarywang.demo.wx.miniapp |
 | 依赖项 | ['org.springframework.boot.SpringApplication', 'org.springframework.boot.autoconfigure.SpringBootApplication'] |
-| 概述说明 | 这是一个Spring Boot应用启动类，包含主方法以运行微信小程序示例程序。 |
+| 概述说明 | 这是一个Spring Boot应用的主类，使用@SpringBootApplication注解标记，通过main方法启动应用。 |
 
 # 说明
 
-这是一个基于Spring Boot框架的微信小程序Demo应用入口类。类上标注了@SpringBootApplication注解，表明这是一个Spring Boot应用的主配置类，会自动启用自动配置和组件扫描。main方法作为程序启动入口，通过SpringApplication.run方法启动整个Spring Boot应用，并传入当前类对象和命令行参数。该类的结构遵循了标准Spring Boot应用的启动模式。
+这是一个基于Spring Boot框架的微信小程序应用入口类。类名为WxMaDemoApplication，使用@SpringBootApplication注解标记，表明这是一个Spring Boot应用的主配置类。该类包含一个标准的main方法，通过调用SpringApplication.run方法来启动整个Spring Boot应用，传入的参数是当前类名和命令行参数。这个类是应用的启动入口，负责初始化Spring容器和自动配置相关组件。
 
 # 类列表 Class Summary
 
@@ -39,30 +39,27 @@ classDiagram
         +main(String[] args) void
     }
     WxMaDemoApplication ..> SpringApplication : 依赖
-    class SpringApplication {
-        <<Spring框架类>>
-        +run(Class~?~ primarySource, String... args) ConfigurableApplicationContext
-    }
 ```
 
-这段代码展示了一个标准的Spring Boot应用启动类结构。WxMaDemoApplication类通过@SpringBootApplication注解标记为Spring Boot应用入口，其main方法通过SpringApplication.run()启动整个应用。类图中清晰显示了WxMaDemoApplication对SpringApplication类的依赖关系，以及SpringApplication作为框架核心类提供的run方法，该方法接收主配置类和命令行参数，返回应用上下文对象。这种结构体现了Spring Boot约定优于配置的设计理念。
+类图描述：  
+该图展示了一个简单的Spring Boot应用启动类WxMaDemoApplication，其中包含main方法作为程序入口。该类通过依赖关系调用SpringApplication.run()方法启动应用。图中清晰体现了Spring Boot应用的启动流程核心结构，即主类与SpringApplication框架类之间的调用关系。
 
 
 ### 内部方法调用关系图
 
 ```mermaid
 graph TD
-    A["类WxMaDemoApplication"]
-    B["注解: @SpringBootApplication"]
+    A["@SpringBootApplication"]
+    B["类: WxMaDemoApplication"]
     C["main方法: main(String[] args)"]
     D["启动Spring应用: SpringApplication.run(WxMaDemoApplication.class, args)"]
-
+    
     A --> B
-    A --> C
+    B --> C
     C --> D
 ```
 
-该流程图描述了基于Spring Boot的微信小程序Demo应用启动流程。类WxMaDemoApplication通过@SpringBootApplication注解标记为Spring Boot应用入口，main方法调用SpringApplication.run()启动嵌入式服务器并加载应用配置，箭头清晰展示了从类定义到应用启动的完整调用链。
+该流程图描述了基于Spring Boot的微信小程序Demo应用的启动过程。`@SpringBootApplication`注解标记主配置类，`main`方法作为入口调用`SpringApplication.run`启动嵌入式容器并加载应用上下文。整个过程体现了Spring Boot的约定优于配置理念，通过注解自动完成大部分初始化工作。
 
 ### 字段列表 Field List
 
@@ -73,7 +70,7 @@ graph TD
 
 | 名称  | 类型  | 说明 |
 |-------|-------|------|
-| main | void | 这是一个Java Spring Boot应用的启动方法，通过SpringApplication运行主类WxMaDemoApplication。 |
+| main | void | Java主方法，使用SpringApplication启动WxMaDemoApplication类。 |
 
 
 

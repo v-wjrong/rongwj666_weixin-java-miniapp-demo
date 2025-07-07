@@ -6,15 +6,15 @@
 | Language | .java |
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang |
 | Package Name | docs.src.main.java.com.github.binarywang |
-| Brief Description | The core backend module of the WeChat Mini Program includes media management, user sessions, and WeChat interaction functionalities, relying on the WeChat SDK and Lombok. It supports file uploads, identity authentication, and message routing, with processes covering validation, processing, and cleanup. The error handling module uniformly manages 404/500 responses. The configuration module manages Mini Program properties and initializes message services. The Spring Boot application entry class launches the entire demo. |
+| Brief Description | The backend core module of the WeChat Mini Program includes media management, user information processing, and message routing functions, adhering to WeChat standards and relying on the WeChat JSSDK and Spring Boot. The error handling module uniformly manages HTTP error status codes and custom error pages. The multi-account configuration module dynamically manages Mini Program accounts and message routing. The application entry class is based on Spring Boot startup. |
 
 # Description
 
 ## Overview  
-This module is an integrated solution for WeChat Mini Program backend services, with core responsibilities including media file management, user session management, interaction with WeChat servers, and unified error handling. The interface specification requires validating AppID effectiveness, adhering to Spring MVC standards, and injecting configurations via the `wx.miniapp` prefix. Key data structures encompass media_id, user session objects, WeChat message encapsulation, and the WxMaProperties.Config configuration class. External dependencies include the WeChat SDK, Spring Framework, and Lombok utility library. For example, the media controller handles multi-file uploads, the error controller returns unified views, and the configuration class enables multi-account management.  
+This module serves as the core backend system for WeChat Mini Programs, integrating four major functionalities: media management, user authentication, message routing, and error handling. Built on the Spring Boot framework, it adheres to the WeChat Open Platform specifications. Key structures include Media_id lists, user session information, and message handler mappings. It relies on WeChat JSSDK, Lombok, and Spring Web components. For example, uploading media returns a media_id, user login exchanges a code for an openid, and error handling supports custom 404 pages. The JSON serialization tool employs a configurable ObjectMapper for efficient conversion.  
 
-## Primary Business Scenarios  
-The module supports four types of typical interactions: media file transfer (similar to cloud storage interfaces), user authentication (similar to OAuth 2.0), WeChat message routing (similar to an event bus pattern), and HTTP error handling (similar to web server error pages). The complete business process consists of three stages: credential verification → business processing → resource cleanup. For instance, user login verifies the code or redirects to an error page in case of exceptions. Integration examples cover file uploads, session decryption, message responses, and error prompts, such as POST interfaces processing encrypted messages or GET returning 404 views. All interactions are implemented through standard Spring MVC controllers.
+## Core Business Scenarios  
+The system manages the entire lifecycle of Mini Programs: media files operate similarly to CDN, user authentication follows the OAuth2.0 flow, message routing adopts an event bus pattern, and error handling mimics frontend route interception. Typical workflows consist of three stages: request validation → business processing → resource cleanup. For instance, decrypting encrypted phone numbers requires session key verification. Integration cases cover five types of message processing, with exceptions handled through log-based degradation. The startup class initializes multi-account configuration services via @SpringBootApplication.
 
 
 ### Package Internal Structure View
@@ -39,12 +39,12 @@ graph TD
     config --> WxMaConfiguration.java
 ```
 
-This flowchart illustrates the core structure of the WeChat Mini Program Demo project, starting from the root directory `binarywang` and hierarchically expanding to the `miniapp` module, which includes submodules such as `controller`, `utils`, `error`, `config`, and their corresponding Java class files. The `controller` module contains three controller classes, `utils` and `error` each have two utility and error-handling classes, the `config` module has two configuration classes, and the top level also includes the main application class `WxMaDemoApplication.java`.
+This flowchart illustrates the directory structure of the WeChat Mini Program Demo project, starting from the root directory binarywang and expanding hierarchically to the demo, wx, and miniapp directories. The miniapp directory contains four subdirectories: controller, utils, error, and config, along with the main program file WxMaDemoApplication.java. Each subdirectory includes specific controller classes, utility classes, error handling classes, and configuration class files, clearly reflecting the project's modular organization.
 
 # File List
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| [demo](demo/_module.md) | package | The core backend module of the WeChat Mini Program includes media management, user sessions, and WeChat interaction functionalities, relying on the WeChat SDK and Lombok. It supports file uploads, identity authentication, and message routing, with processes covering validation, processing, and cleanup. The error handling module uniformly manages 404/500 responses. The configuration module manages Mini Program properties and initializes message services. The Spring Boot application entry class launches the entire demo. |
+| [demo](demo/_module.md) | package | The WeChat Mini Program backend core module includes media management, user information processing, and message routing functionalities, adhering to WeChat standards and relying on WeChat JSSDK and Spring Boot. The error handling module uniformly manages HTTP error status codes and custom error pages. The multi-account configuration module dynamically manages Mini Program accounts and message routing. The application entry class is based on Spring Boot startup. |
 
 

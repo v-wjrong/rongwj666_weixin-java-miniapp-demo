@@ -6,15 +6,15 @@
 | 编码语言 | .java |
 | 代码路径 | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/config |
 | 包名 | docs.src.main.java.com.github.binarywang.demo.wx.miniapp.config |
-| 概述说明 | 微信小程序Java配置类：WxMaProperties绑定小程序配置项（ID、密钥等），WxMaConfiguration初始化服务并处理消息路由（文本、图片等回复逻辑）。 |
+| 概述说明 | 微信小程序配置类WxMaProperties绑定wx.miniapp前缀，含多小程序配置列表，每个配置含appid、secret等字段。WxMaConfiguration类初始化小程序服务并配置消息路由，处理文本、图片等消息类型，含上传和生成功能。 |
 
 # 说明
 
 ## 概述  
-该模块是微信小程序后端服务的Java实现，核心职责是管理小程序配置属性和初始化消息处理服务。接口规范包括通过`wx.miniapp`前缀注入配置，以及定义消息路由规则链。关键数据结构为`WxMaProperties.Config`类，包含AppID、密钥等字段。外部依赖项包括Spring配置注解、Lombok和微信SDK。例如，配置类支持多账号参数校验，消息处理器实现二维码生成等逻辑。
+该模块核心职责是管理微信小程序的多账号配置和消息路由，支持动态初始化服务及处理各类消息事件。采用Spring Boot的@ConfigurationProperties绑定配置，类似工厂模式创建多实例服务。关键数据结构包括WxMaProperties.Config（含appid/secret等字段）和消息路由器定义的处理器映射。外部依赖仅为微信小程序SDK。例如Config存储小程序密钥，消息处理器处理图片上传等操作。
 
 ## 主要业务场景  
-模块主要处理小程序服务初始化和消息交互，类似事件总线模式。业务流程包括加载配置、创建`WxMaService`实例、注册消息处理器链。交互模式涵盖文本/图片回复、订阅消息推送等场景。例如，图片处理器会上传媒体文件，二维码处理器生成带参二维码。API类型集中在小程序服务配置和消息路由，集成案例展示多账号管理和链式消息响应。
+模块主要实现多小程序账号的集中配置和消息分发，类似事件总线模式。业务流程包括：初始化时校验配置并创建服务实例；消息路由根据类型（文本/图片等）调用对应处理器，例如二维码消息触发媒体上传后生成响应。集成案例展示五类消息处理，均遵循"接收-处理-日志"模式，异常通过日志记录不阻断流程。
 
 
 ### 包内部结构视图
@@ -25,13 +25,13 @@ graph TD
     config --> WxMaConfiguration.java
 ```
 
-该流程图展示了微信小程序demo项目中配置模块的层级结构。根节点为config目录，包含两个Java配置文件：WxMaProperties.java和WxMaConfiguration.java。这两个文件分别用于处理小程序属性配置和整体配置逻辑，共同构成了项目的基础配置模块。结构清晰体现了配置文件的组织方式，符合典型Spring Boot应用的配置管理规范。
+该流程图展示了微信小程序Demo项目中配置模块的层级结构。根节点为config目录，其下包含两个Java配置文件：WxMaProperties.java用于存储小程序属性配置，WxMaConfiguration.java负责初始化微信小程序相关配置。这种结构清晰体现了Spring Boot项目中典型的配置类组织方式，通过独立文件分离不同配置关注点。
 
 # 文件列表
 
 | 名称   | 类型  | 说明 |
 |-------|------|-------------|
-| [WxMaProperties.java](WxMaProperties.md) | file | WxMaProperties类用于配置微信小程序属性，包含appid、secret、token、aesKey和msgDataFormat等字段。 |
-| [WxMaConfiguration.java](WxMaConfiguration.md) | file | 微信小程序配置类，包含服务初始化和消息路由设置，支持多种消息处理如文本、图片、二维码等。 |
+| [WxMaProperties.java](WxMaProperties.md) | file | WxMaProperties类用于配置微信小程序属性，包含多个Config配置项，每个配置项有appid、secret、token、aesKey和msgDataFormat字段。 |
+| [WxMaConfiguration.java](WxMaConfiguration.md) | file | 微信小程序配置类，初始化WxMaService和消息路由，处理订阅、文本、图片、二维码等消息类型。 |
 
 
