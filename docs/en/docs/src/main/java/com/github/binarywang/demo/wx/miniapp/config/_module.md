@@ -6,15 +6,15 @@
 | Language | .java |
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/config |
 | Package Name | docs.src.main.java.com.github.binarywang.demo.wx.miniapp.config |
-| Brief Description | The WxMaProperties class configures WeChat Mini Program attributes, including fields such as appid and secret. The WxMaConfiguration class initializes Mini Program services and message routing, defining the logic for various message handlers. |
+| Brief Description | WeChat Mini Program Java Configuration Classes: WxMaProperties defines core configuration items for mini programs; WxMaConfiguration initializes multi-account services and message routing; ResourcesConfig configures local file storage and cross-origin access. |
 
 # Description
 
 ## Overview  
-This module is a Java configuration implementation for the WeChat Mini Program server, with its core responsibilities being the management of multi-account configurations and the initialization of message processing services. The interface specifications adhere to Spring Boot's @ConfigurationProperties standard and support XML/JSON message formats. Key data structures include WxMaProperties (containing a Config list) and message router rules. External dependencies include Lombok and the WeChat SDK. For example, the Config class defines fields such as appid/secret, while the message router handles subscription messages and media files.  
+This module serves as a Java configuration center for the backend of WeChat Mini Programs, with its core responsibilities including managing Mini Program account configurations, initializing service instances, and handling message routing. The interface specifications uniformly adopt the Spring Boot configuration style, such as using `@ConfigurationProperties` to define Mini Program attributes and `WebMvcConfigurer` to handle resource mapping. Key data structures include `WxMaProperties.Config` (containing fields like appid/secret) and message router rules. External dependencies include Spring Boot, Lombok, and the WeChat SDK. For example, `msgDataFormat` configures message formats, or cross-origin settings allow GET access to resources.
 
-## Main Business Scenarios  
-The module primarily handles the initialization of multi-account services for Mini Programs and the configuration of message routing, similar to the factory pattern for creating service instances. The business process includes configuration validation, service instantiation, and handler registration. For instance, text messages trigger customer service responses, and QR code generation utilizes the Media API. The typical application pattern involves loading configurations at startup and distributing messages to corresponding handlers via the router during runtime. API types cover RESTful configurations and event callbacks, with integration examples including subscription message pushes and media file management.
+## Core Business Scenarios  
+The module supports multi-account Mini Program service initialization, similar to the microservice configuration center model. The business workflow includes: validating configurations → creating service instances → registering message handlers (e.g., text/image processing). The interaction mode is annotation-driven, such as injecting file paths via `@Value`. Typical applications include configuring bulk messages, generating QR codes, and other WeChat ecosystem features. API types cover REST resource mapping (e.g., local file access) and message routing APIs (e.g., subscription message callbacks). For example, after an image upload, the media file handler is triggered, and a CDN link is returned.
 
 
 ### Package Internal Structure View
@@ -23,9 +23,10 @@ The module primarily handles the initialization of multi-account services for Mi
 graph TD
     config --> WxMaProperties.java
     config --> WxMaConfiguration.java
+    config --> ResourcesConfig.java
 ```
 
-This flowchart illustrates the hierarchical structure of the configuration module in the WeChat Mini Program demo project. The config directory contains two Java configuration files: WxMaProperties.java stores the mini program's property configurations, while WxMaConfiguration.java handles the initialization settings for the mini program service. Together, these two files form the foundational configuration system of the mini program.
+This flowchart illustrates the file structure relationships within the config directory of the WeChat Mini Program demo project. The top-level node is the config folder, which contains three configuration files: WxMaProperties.java, WxMaConfiguration.java, and ResourcesConfig.java. These files belong to the basic configuration classes of the WeChat Mini Program, handling different aspects of configuration information, and together form the configuration module of the project.
 
 # File List
 
@@ -33,5 +34,6 @@ This flowchart illustrates the hierarchical structure of the configuration modul
 |-------|------|-------------|
 | [WxMaProperties.java](WxMaProperties.md) | file | This is a WeChat Mini Program configuration class, which includes multiple Mini Program configuration items. Each configuration item has fields such as appid, secret, token, aesKey, and message format msgDataFormat. |
 | [WxMaConfiguration.java](WxMaConfiguration.md) | file | This is a WeChat Mini Program configuration class that includes service initialization and message routing setup. It loads configurations via WxMaProperties and creates a WxMaService instance to handle multi-account configurations. The message router defines processing logic for different content types, including subscription messages, text, images, and QR code response handling. |
+| [ResourcesConfig.java](ResourcesConfig.md) | file | Resource configuration class, defining local file paths and prefixes, mapping resource paths, and enabling cross-origin support to allow GET request access. |
 
 

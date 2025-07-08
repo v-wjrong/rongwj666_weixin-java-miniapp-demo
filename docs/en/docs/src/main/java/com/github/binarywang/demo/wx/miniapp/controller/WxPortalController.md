@@ -11,7 +11,7 @@
 
 # Description
 
-The code defines a WeChat Mini Program portal controller class, containing two main interfaces. The GET interface is used for WeChat server authentication verification, receiving parameters such as signature, timestamp, and random string, and returns the original string upon successful validation. The POST interface handles WeChat message push, supporting both plaintext and AES-encrypted formats. It automatically parses JSON or XML format messages based on configuration and processes them through a message router. Both interfaces check the validity of the appid and clean up thread-local storage after processing. The controller logs detailed request information and throws exceptions or returns error prompts for illegal requests.
+The code defines a WeChat Mini Program portal controller class, which includes two main interfaces. The GET interface is used for WeChat server authentication verification, receiving parameters such as signature, timestamp, and random string, and returns the original string upon successful validation. The POST interface handles WeChat message push, supporting both plaintext and AES-encrypted formats. It automatically parses JSON or XML format messages based on configuration and processes them through a message router. Both interfaces check the validity of the appid and clean up thread-local storage after processing. The controller logs detailed request information and throws exceptions or returns error prompts for illegal requests.
 
 # Class Summary
 
@@ -84,7 +84,7 @@ classDiagram
     WxMaService --> WxMaConstants : Use Enum
 ```
 
-Class Diagram Description: This diagram illustrates the core structure of a WeChat Mini Program Portal Controller (WxPortalController), which relies on WxMaService for WeChat service switching and signature verification, and uses WxMaMessageRouter for message routing. The controller includes GET/POST request handling methods to process plaintext/AES-encrypted messages, converting message formats via WxMaMessage factory methods. All operations clear the ThreadLocal-stored configuration (WxMaConfigHolder) afterward. The system retrieves message format configurations through WxMaConfig and adheres to the enumeration standards defined by WxMaConstants.
+Class Diagram Description: This diagram illustrates the core structure of a WeChat Mini Program Portal Controller (WxPortalController), which relies on WxMaService for WeChat service switching and signature verification, and uses WxMaMessageRouter for message routing. The controller contains GET/POST request handling methods to process plaintext/AES-encrypted messages, converting message formats via WxMaMessage factory methods. All operations clear the ThreadLocal-stored configuration (WxMaConfigHolder) afterward. The system retrieves message format configurations through WxMaConfig and adheres to the enumeration specifications defined in WxMaConstants.
 
 
 ### Internal Method Call Graph
@@ -108,7 +108,7 @@ graph TD
     E2["Switch Configuration: wxMaService.switchover"]
     E3["Check Message Format: isJson"]
     E4["Plaintext Processing: fromJson/fromXml"]
-    E5["AES Encrypted Processing: fromEncryptedJson/fromEncryptedXml"]
+    E5["AES-encrypted Processing: fromEncryptedJson/fromEncryptedXml"]
     E6["Route Message: this.route"]
     E7["Return 'success' or Throw Exception"]
     
@@ -141,7 +141,7 @@ graph TD
     F --> F2
 ```
 
-This flowchart illustrates the complete processing logic of the WeChat portal controller. The GET method (authGet) handles WeChat server verification, including parameter validation, configuration switching, and signature verification. The POST method (post) processes business messages, performing different parsing based on encryption type and format (json/xml), ultimately routing for processing. The private method (route) handles actual message routing and exception handling. All methods finally clear the ThreadLocal-stored configuration information.
+This flowchart illustrates the complete processing logic of the WeChat portal controller. The GET method (authGet) is used for WeChat server validation, involving parameter checks, configuration switching, and signature verification. The POST method (post) handles business messages, performing different parsing based on encryption type and format (json/xml), ultimately routing for processing. The private method (route) manages actual message routing and exception handling. All methods eventually clear the ThreadLocal-stored configuration information.
 
 ### Field List
 
@@ -154,8 +154,8 @@ This flowchart illustrates the complete processing logic of the WeChat portal co
 
 | Name  | Type  | Description |
 |-------|-------|------|
-| post | String | POST interface for handling WeChat requests, verifying the appid and parsing plaintext or AES-encrypted XML/JSON messages, then routing and processing them before returning success or error responses. |
-| authGet | String | This is a GET interface for handling WeChat authentication, which verifies the signature parameters and returns the echostr or an error message, including parameter validation and ThreadLocal cleanup. |
+| post | String | POST interface for handling WeChat requests, verifying appid and parsing plaintext or AES-encrypted XML/JSON messages, with routing processing to return success or error responses. |
+| authGet | String | This is a GET interface for handling WeChat authentication, which verifies the signature parameters and returns echostr or an error message, including parameter validation and ThreadLocal cleanup. |
 | route | void | Route WeChat Mini Program messages and log error messages in case of exceptions. |
 
 

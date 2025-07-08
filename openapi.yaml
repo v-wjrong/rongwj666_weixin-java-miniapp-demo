@@ -84,11 +84,18 @@ paths:
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaUserController#info
       parameters:
       - in: query
-        name: teamId
+        name: userId
         required: true
         description: ''
         schema:
           type: string
+      - in: query
+        name: offset
+        required: true
+        description: ''
+        schema:
+          type: integer
+          format: int32
       - in: path
         name: appid
         required: true
@@ -112,11 +119,12 @@ paths:
       operationId: weixin-java-miniapp-demo_com.github.binarywang.demo.wx.miniapp.controller.WxMaUserController#phone
       parameters:
       - in: query
-        name: userId
+        name: limit
         required: true
         description: ''
         schema:
-          type: string
+          type: integer
+          format: int32
       - in: path
         name: appid
         required: true

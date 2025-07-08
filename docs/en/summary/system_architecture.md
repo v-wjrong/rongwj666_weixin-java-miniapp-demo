@@ -1,83 +1,158 @@
 ## System Architecture
 
-## System Overview  
+## System Overview
 
-This section outlines the core functionalities, business domains, and architectural patterns of the WeChat Mini Program Java backend project.  
+This section outlines the core functionalities, business domains, and architectural patterns of the WeChat Mini Program Java backend project.
 
-* **Core Functionalities and Business Domains:** This project serves as the backend for a WeChat Mini Program, primarily handling API requests, message server configurations, and integration with the WeChat ecosystem. The business domain focuses on WeChat Mini Program development, providing core functionalities such as authentication, message processing, and configuration management.  
-* **Architectural Pattern:** The project adopts a **monolithic application** architecture.  
-* **Supporting Evidence for Architectural Pattern:**  
-    * The `Dockerfile` indicates the project is built as a single JAR file and runs in a single container.  
-    * The project structure lacks a `services/` directory or similar microservices-related folders, with all functional modules packaged into a single application.  
-    * Dependency management files (e.g., `.travis.yml`) show a single build process without signs of independent builds for multiple services.  
-    * Code snippets reveal no inter-service communication mechanisms, suggesting all functionalities are handled within the same process.  
+* **Core Functionalities and Business Domains:**
+    * The project serves as a backend service for a WeChat Mini Program, with primary functionalities including:
+        * Handling API requests from the WeChat Mini Program
+        * Managing Mini Program configuration information (appid, secret, token, aesKey)
+        * Processing events and messages from the Mini Program message server
+    * The business domain focuses on Mini Program development within the WeChat ecosystem, providing foundational capabilities for interfacing with WeChat's official APIs.
 
-## Core Components and Functional Diagram  
+* **Architectural Pattern:**
+    * **Monolithic Application Architecture**
+    
+* **Architectural Pattern Justification:**
+    * The project uses a single Dockerfile to build a JAR package containing all functionalities
+    * Application configurations are centralized in a single application.yml file
+    * No microservice-specific directory structures or inter-service communication mechanisms were identified
+    * Developed using the Spring Boot framework, which is typical for monolithic applications
+    * Simple deployment configuration involving only containerization of a single Java service
 
-This section details the system's main components and their responsibilities, supplemented with insights specific to WeChat Mini Program backends.  
+## Core Components and Functional Map
 
-* **Traffic Entry Layer:**  
-    * **Components and Responsibilities:** As a monolithic application, the traffic entry layer is likely handled by an embedded Spring Boot web server (e.g., Tomcat) or fronted by an Nginx reverse proxy and load balancer.  
-    * **Implementation Considerations:** Monolithic architectures typically expose application server ports directly or manage traffic through simple reverse proxies.  
-* **Application Service Layer:**  
-    * **Service List and Core Functionalities:**  
-        * **WeChat Mini Program API Service:**  
-            * **Primary Responsibilities:** Handles API requests from the WeChat Mini Program, including authentication, message processing, and configuration management.  
-            * **Technical Foundation:** Built with Java and the Spring Boot framework, leveraging the `wx-java-miniapp` SDK for WeChat ecosystem integration.  
-            * **Internal Structure Insights:** Follows a typical Spring Boot structure, likely comprising `controller`, `service`, and `repository` layers.  
-    * **Asynchronous Tasks and Background Processing:** The current architecture shows no explicit asynchronous task handling mechanisms, though WeChat message processing may require task queues for high-concurrency scenarios.  
-* **Data Management Layer:**  
-    * **Data Storage Components and Responsibilities:** Configuration files do not explicitly specify database settings, but Spring Boot applications commonly use relational databases (e.g., MySQL) or embedded databases (e.g., H2).  
-    * **Data Responsibilities and Selection Rationale:** WeChat Mini Program backends typically store user sessions, configuration data, and message logs, making relational databases suitable for such structured data.  
+This section details the system's main components and their responsibilities, including the traffic entry layer, application service layer, and data management layer.
 
-## Container Configuration Overview  
+* **Traffic Entry Layer:**
+    * **Components and Responsibilities:**
+        * The WeChat Mini Program client communicates directly with the backend service via HTTPS
+        * No explicit API gateway or load balancer configuration was found, possibly handled by WeChat Cloud or a simple deployment solution
+    * **Implementation Considerations:**
+        * In a monolithic architecture, traffic flows directly into the application service
+        * Production environments may require adding Nginx as a reverse proxy and load balancer
 
-This section lists containerized service configurations identified through deployment file analysis.  
+* **Application Service Layer:**
+    * **Service Inventory and Core Functionalities:**
+        * **WeChat Mini Program Backend Service**
+            * **Primary Responsibilities:**
+                * Handling all API requests from the WeChat Mini Program
+                * Verifying WeChat message signatures
+                * Processing message server events
+                * Interfacing with WeChat Open Platform APIs
+            * **Technical Foundation:**
+                * Java 8
+                * Spring Boot framework
+                * WxJava WeChat Development SDK
+            * **Internal Structure Insights:**
+                * Follows conventional Spring Boot structure
+                * Likely includes Controller, Service, and Repository layers
+                * WeChat-related configurations are centrally managed
 
-| Service Name (Service Name) | Container Image (Container Image) | Exposed Ports (Exposed Ports) | Volumes (Volumes) | Key Environment Variables (Key Env Vars) | Startup Command/Entrypoint (Startup Command/Entrypoint) |  
-| :------------------------- | :-------------------------------- | :---------------------------- | :---------------- | :--------------------------------------- | :------------------------------------------------------ |  
-| `wx-miniapp-service`       | `openjdk:8-jdk-alpine` (built from Dockerfile) | Not explicitly specified, typically `8080` | `/tmp` | `wx.miniapp.configs.*` (appid, secret, token, aesKey) | `java -Djava.security.egd=file:/dev/./urandom -jar /app.jar` |  
+* **Data Management Layer:**
+    * **Data Storage Components and Responsibilities:**
+        * Current configuration does not explicitly define database dependencies
+        * May use in-memory storage or simple file storage for configuration data
+        * Production environments may require adding:
+            * MySQL/PostgreSQL as the primary database
+            * Redis for caching
+    * **Data Responsibilities and Selection Considerations:**
+        * Mini Program configuration information requires secure storage
+        * User session data may need persistence
+        * WeChat API calls may benefit from caching for performance optimization
 
-## Inter-Service Collaboration and Data Flow  
+## Container Configuration Overview
 
-This section describes data movement and interaction patterns between internal components and external users.  
+This section lists the containerized service configurations identified through deployment file analysis.
 
-* **Core Communication Paths:** The WeChat Mini Program client communicates directly with the backend service via HTTPS, with all requests uniformly handled by the Spring Boot application.  
-* **Interaction Patterns and Protocols:** Uses RESTful HTTP APIs for synchronous communication, adhering to WeChat's official API specifications.  
-* **Sharing and Isolation:** In a monolithic architecture, all modules share the same database connection and memory space, eliminating the need for inter-service isolation.  
+| Service Name | Container Image | Exposed Ports | Volumes | Key Env Vars | Startup Command/Entrypoint |
+| :---------------------- | :-------------------------- | :----------------------- | :--------------- | :-------------------------- | :------------------------------------------- |
+| weixin-java-miniapp | Built on openjdk:8-jdk-alpine | Not explicitly specified | /tmp (temporary volume) | WeChat parameters configured via application.yml | java -Djava.security.egd=file:/dev/./urandom -jar /app.jar |
 
-## Overall Architecture Diagram (Mermaid Syntax)  
+## Service Collaboration and Data Flow
 
-```mermaid  
-graph TD  
-    A[WeChat Mini Program Client] -- HTTPS --> B[Spring Boot Application]  
-    subgraph Monolithic Application  
-        B --> C[WeChat API Controller]  
-        C --> D[Business Logic Service]  
-        D --> E[Data Access Layer]  
-    end  
-    E --> F[(Database)]  
-    B --> G[WeChat Server] -- Message Push --> B  
-```  
+This section describes the data flow paths and interaction patterns between internal system components and external users.
 
-## Architect's Key Insights and Future Outlook  
+* **Core Communication Paths:**
+    * WeChat Mini Program Client → HTTPS → Backend Service → WeChat Open Platform API
+    * WeChat Message Server → HTTPS → Backend Service Message Handler
 
-This section analyzes critical architectural considerations and future evolution directions.  
+* **Interaction Patterns and Protocols:**
+    * All communications are HTTPS-based
+    * Primarily synchronous request-response mode
+    * WeChat server message pushes use an event-driven model
 
-* **Resilience and Scalability Strategies:** The current monolithic architecture can improve performance through vertical scaling (increasing container resources) but has limited horizontal scalability. Stateless design is recommended for future horizontal scaling.  
-* **High Availability and Fault Tolerance:** Deploying multiple instances with load balancing ensures single points of failure do not disrupt the service.  
-* **Security Defenses:** Focus on secure storage of WeChat credentials (using secrets management), enforcing HTTPS, and request signature validation.  
-* **Operational Observability and Automation:** Recommend adding Spring Boot Actuator for health monitoring and integrating Prometheus/Grafana for metrics collection.  
-* **Performance Optimization Potential:** Temporary credentials like WeChat access_token should be cached in Redis to avoid frequent requests to WeChat servers.  
-* **Technology Stack Rationale Assessment:** Java + Spring Boot suits enterprise-level WeChat ecosystem integration but may lack agility for rapid Mini Program iterations due to longer startup times.  
-* **Future Evolution Path and Technology Adoption:** As complexity grows, consider isolating message processing into microservices and introducing message queues (e.g., RabbitMQ) for asynchronous handling.
+* **Sharing and Isolation:**
+    * All functionalities share the same runtime in the monolithic architecture
+    * Configuration data is centrally managed
+    * No explicit data isolation requirements were identified
+
+## Overall Architecture Overview (Mermaid Syntax)
+
+```mermaid
+graph TD
+    A[WeChat Mini Program Client] -- HTTPS --> B[WeChat Java Backend Service]
+    B -- HTTPS API Calls --> C[WeChat Open Platform]
+    C -- Responses/Events --> B
+    D[WeChat Message Server] -- HTTPS Message Push --> B
+    
+    subgraph Application Service Layer
+        B[Spring Boot Application]
+    end
+    
+    subgraph External Systems
+        C[WeChat Open Platform]
+        D[WeChat Message Server]
+    end
+```
+
+## Architect's Key Insights and Future Outlook
+
+This section analyzes critical architectural considerations and future evolution directions.
+
+* **Elasticity and Scalability Strategies:**
+    * Current monolithic architecture can scale horizontally via multi-instance deployment
+    * Stateless design facilitates scalability
+    * May require adding a load balancer for traffic distribution
+
+* **High Availability and Resilience Design:**
+    * Need to ensure retry mechanisms for WeChat API calls
+    * Message processing requires idempotent design
+    * Critical configurations need backup mechanisms
+
+* **Security Defense System:**
+    * Sensitive WeChat configurations (appid/secret etc.) require secure storage
+    * All communications must be HTTPS encrypted
+    * WeChat message signature verification is essential
+
+* **Operational Observability and Automation:**
+    * Add Spring Boot Actuator endpoints
+    * Integrate log collection and analysis systems
+    * Implement CI/CD automated deployment pipelines
+
+* **Performance Optimization Potential:**
+    * Cache results of WeChat API calls
+    * Asynchronize message processing
+    * Optimize database queries (e.g., by adding indexes)
+
+* **Technology Stack Rationality Assessment:**
+    * Java + Spring Boot is suitable for enterprise-level WeChat ecosystem development
+    * WxJava SDK provides excellent encapsulation of WeChat APIs
+    * The technology stack is mature, stable, and well-supported by the community
+
+* **Future Evolution Path and Technology Introduction:**
+    * Add extended functionalities like user management and data analysis
+    * Consider microservice decomposition (e.g., independent message processing service)
+    * Introduce Redis for performance optimization and distributed locking
+    * Add message queues for handling high-concurrency events
 
 You are a professional translation assistant. Please accurately translate the following content into the target language.  
 Please strictly adhere to the following guidelines:  
 1. Maintain consistency with the original text's semantics, context, and style.  
 2. Preserve the original hierarchical structure and numbering system in full.  
 3. Strictly retain all formatting elements from the original text, such as code block identifiers (```text/```, ```mermaid/```), etc.  
-4. Only translate natural language content; do not perform format adjustments, content additions, or explanatory processing.  
+4. Translate only the natural language content, without making any format adjustments, content additions, or explanatory processing.  
 5. Output only the translated result of the original text, without any additional prompt information.  
 
 Content to be translated:  
