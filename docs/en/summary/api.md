@@ -2,7 +2,7 @@
 # API Documentation
 
 <iframe 
-    src="https://code2docs.ai/wiki/binary/weixin-java-miniapp-demo/api-viewer.html" 
+    src="https://code2docs.ai/wiki/rongwj666/weixin-java-miniapp-demo/api-viewer.html" 
     width="100%" 
     height="1000px" 
     style="border: none; overflow: hidden;"

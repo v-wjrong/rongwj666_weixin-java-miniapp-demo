@@ -5,12 +5,12 @@
 | 名称 | weixin-java-miniapp-demo |
 | 编码语言 | .java |
 | 代码路径 | weixin-java-miniapp-demo |
-| 概述说明 | 微信小程序后端核心系统，整合媒体管理、用户认证、消息路由和错误处理四大功能。基于Spring Boot，支持微信JSSDK和OAuth2.0流程，实现文件上传、登录认证、消息处理和异常拦截。典型流程包括请求校验、业务处理和资源清理。 |
+| 概述说明 | 微信小程序后端Spring Boot模块，核心功能包括媒体管理、用户会话、消息交互和错误处理。支持RESTful接口，依赖微信API和AES加密。典型场景：文件上传、登录授权、消息解密和多租户隔离。 |
 
 # 模块列表
 
 | 名称   | 类型  | 说明 |
 |-------|------|-------------|
-| [_module.md](src/main/java/com/_module.md) | folder | 微信小程序后端核心模块，含媒体管理、用户信息处理和消息路由功能，遵循微信标准，依赖微信JSSDK和Spring Boot。错误处理模块统一管理HTTP错误状态码，自定义错误页面。多账号配置模块动态管理小程序账号和消息路由。应用入口类基于Spring Boot启动。 |
+| [_module.md](src/main/java/com/_module.md) | folder | Spring Boot微信小程序Demo，含启动类、控制器、JSON工具、错误处理和配置模块。控制器处理媒体、用户和消息，工具类处理JSON序列化，错误模块统一处理HTTP错误，配置模块管理多账号和消息服务。 |
 
 

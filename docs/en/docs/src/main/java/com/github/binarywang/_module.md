@@ -6,15 +6,15 @@
 | Language | .java |
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang |
 | Package Name | docs.src.main.java.com.github.binarywang |
-| Brief Description | The backend core module of the WeChat Mini Program includes media management, user information processing, and message routing functions, adhering to WeChat standards and relying on the WeChat JSSDK and Spring Boot. The error handling module uniformly manages HTTP error status codes and custom error pages. The multi-account configuration module dynamically manages Mini Program accounts and message routing. The application entry class is based on Spring Boot startup. |
+| Brief Description | Spring Boot WeChat Mini Program Demo, including startup class, controllers, JSON utilities, error handling, and configuration modules. The controllers handle media, users, and messages; the utility class manages JSON serialization; the error module uniformly processes HTTP errors; and the configuration module manages multi-account and message services. |
 
 # Description
 
 ## Overview  
-This module serves as the core backend system for WeChat Mini Programs, integrating four major functionalities: media management, user authentication, message routing, and error handling. Built on the Spring Boot framework, it adheres to the WeChat Open Platform specifications. Key structures include Media_id lists, user session information, and message handler mappings. It relies on WeChat JSSDK, Lombok, and Spring Web components. For example, uploading media returns a media_id, user login exchanges a code for an openid, and error handling supports custom 404 pages. The JSON serialization tool employs a configurable ObjectMapper for efficient conversion.  
+This module is a Spring Boot implementation for the backend service of WeChat Mini Programs. Its core responsibilities include media file management, user session handling, WeChat message interaction, and unified error handling. It adheres to RESTful interface standards, supports JSON/XML data formats, and key data structures encompass Media_id lists, user session information (sessionKey/openid), and WeChat message bodies. External dependencies include the WeChat server API, AES encryption library, Spring Web framework, and Lombok. For example, the media controller handles file uploads, the user controller manages login authorization, and the configuration module initializes multi-account services.  
 
-## Core Business Scenarios  
-The system manages the entire lifecycle of Mini Programs: media files operate similarly to CDN, user authentication follows the OAuth2.0 flow, message routing adopts an event bus pattern, and error handling mimics frontend route interception. Typical workflows consist of three stages: request validation → business processing → resource cleanup. For instance, decrypting encrypted phone numbers requires session key verification. Integration cases cover five types of message processing, with exceptions handled through log-based degradation. The startup class initializes multi-account configuration services via @SpringBootApplication.
+## Key Business Scenarios  
+The module supports four typical types of interactions: media transfer (similar to FTP), identity authentication (similar to OAuth), message processing (similar to an event bus), and error fallback (similar to a route interceptor). Business processes follow the "validate-process-cleanup" pattern, such as user login, which first verifies the code before retrieving session information. Typical applications include uploading temporary materials, decrypting user phone numbers, and processing encrypted messages. All interfaces strictly validate appid to ensure multi-tenant isolation. Integration examples include subscription message push and 500 error page rendering.
 
 
 ### Package Internal Structure View
@@ -24,11 +24,11 @@ graph TD
     binarywang --> demo
     demo --> wx
     wx --> miniapp
+    miniapp --> WxMaDemoApplication.java
     miniapp --> controller
     miniapp --> utils
     miniapp --> error
     miniapp --> config
-    miniapp --> WxMaDemoApplication.java
     controller --> WxMaMediaController.java
     controller --> WxMaUserController.java
     controller --> WxPortalController.java
@@ -39,12 +39,12 @@ graph TD
     config --> WxMaConfiguration.java
 ```
 
-This flowchart illustrates the directory structure of the WeChat Mini Program Demo project, starting from the root directory binarywang and expanding hierarchically to the demo, wx, and miniapp directories. The miniapp directory contains four subdirectories: controller, utils, error, and config, along with the main program file WxMaDemoApplication.java. Each subdirectory includes specific controller classes, utility classes, error handling classes, and configuration class files, clearly reflecting the project's modular organization.
+This flowchart illustrates the directory structure of the WeChat Mini Program Demo project, starting from the root directory `binarywang` and expanding hierarchically to the `miniapp` module, which includes submodules such as the main application class, controllers, utility classes, error handling, and configurations. Each submodule contains its corresponding implementation class files, forming a clear hierarchical relationship.
 
 # File List
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| [demo](demo/_module.md) | package | The WeChat Mini Program backend core module includes media management, user information processing, and message routing functionalities, adhering to WeChat standards and relying on WeChat JSSDK and Spring Boot. The error handling module uniformly manages HTTP error status codes and custom error pages. The multi-account configuration module dynamically manages Mini Program accounts and message routing. The application entry class is based on Spring Boot startup. |
+| [demo](demo/_module.md) | package | Spring Boot WeChat Mini Program Demo, including startup class, controllers, JSON utilities, error handling, and configuration modules. Controllers handle media, users, and messages; utility classes manage JSON serialization; error module uniformly processes HTTP errors; configuration module manages multi-account and messaging services. |
 
 

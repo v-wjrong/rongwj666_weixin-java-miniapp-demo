@@ -7,17 +7,17 @@
 | Code Path | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp/error/ErrorPageConfiguration.java |
 | Package Name | com.github.binarywang.demo.wx.miniapp.error |
 | Dependencies | ['org.springframework.boot.web.server.ErrorPage', 'org.springframework.boot.web.server.ErrorPageRegistrar', 'org.springframework.boot.web.server.ErrorPageRegistry', 'org.springframework.http.HttpStatus', 'org.springframework.stereotype.Component'] |
-| Brief Description | Define the error page configuration class and register the handling paths for 404 and 500 errors. |
+| Brief Description | The ErrorPageConfiguration class registers 404 and 500 error pages, pointing to the paths /error/404 and /error/500 respectively. |
 
 # Description
 
-The code defines a Spring component class named ErrorPageConfiguration, which implements the ErrorPageRegistrar interface. It overrides the registerErrorPages method and registers two error pages via the passed-in ErrorPageRegistry object: when a 404 status code occurs, it redirects to the /error/404 path, and when a 500 status code occurs, it redirects to the /error/500 path. This configuration class is used to customize the application's error page handling logic.
+The code defines a Spring component class named `ErrorPageConfiguration`, which implements the `ErrorPageRegistrar` interface. It overrides the `registerErrorPages` method to register two error pages via the `ErrorPageRegistry`: redirecting to the `/error/404` path when a 404 status code occurs, and to the `/error/500` path when a 500 status code occurs. This configuration class is used to handle common HTTP errors in web applications.
 
 # Class Summary
 
 | Name   | Type  | Description |
 |-------|------|-------------|
-| ErrorPageConfiguration | class | The ErrorPageConfiguration class registers 404 and 500 error pages, pointing to the paths /error/404 and /error/500 respectively. |
+| ErrorPageConfiguration | class | The Java class ErrorPageConfiguration implements the ErrorPageRegistrar interface, registering the handling paths for 404 and 500 error pages. |
 
 
 
@@ -28,7 +28,7 @@ The code defines a Spring component class named ErrorPageConfiguration, which im
 | Access Modifier | @Component;public |
 | Type | class |
 | Name | ErrorPageConfiguration |
-| Description | The ErrorPageConfiguration class registers 404 and 500 error pages, pointing to the paths /error/404 and /error/500 respectively. |
+| Description | The Java class ErrorPageConfiguration implements the ErrorPageRegistrar interface, registering the handling paths for 404 and 500 error pages. |
 
 
 ### UML Class Diagram
@@ -38,31 +38,25 @@ classDiagram
     class ErrorPageConfiguration {
         +registerErrorPages(ErrorPageRegistry errorPageRegistry) void
     }
-    <<Interface>> ErrorPageRegistrar {
-        +registerErrorPages(ErrorPageRegistry errorPageRegistry) void
-    }
+    <<Interface>> ErrorPageRegistrar
+    ErrorPageConfiguration ..|> ErrorPageRegistrar : implements
     class ErrorPageRegistry {
         +addErrorPages(ErrorPage... errorPages) void
     }
     class ErrorPage {
-        -HttpStatus status
-        -String path
         +ErrorPage(HttpStatus status, String path)
     }
     class HttpStatus {
         <<enumeration>>
         NOT_FOUND
         INTERNAL_SERVER_ERROR
-        // ...other status codes
     }
-
-    ErrorPageConfiguration --> ErrorPageRegistrar : implements
-    ErrorPageConfiguration --> ErrorPageRegistry : depends on
+    ErrorPageConfiguration --> ErrorPageRegistry : uses
     ErrorPageConfiguration --> ErrorPage : creates
-    ErrorPage --> HttpStatus : uses enum
+    ErrorPage --> HttpStatus : depends
 ```
 
-Class Diagram Description: This diagram illustrates the core structure of Spring Boot's error page configuration. The ErrorPageConfiguration, as a @Component, implements the ErrorPageRegistrar interface and registers multiple ErrorPage instances with the ErrorPageRegistry via the registerErrorPages method. Each ErrorPage binds a specific HTTP status code (e.g., 404/500) to an error handling path, where HttpStatus is an enumeration type. The overall structure demonstrates a declarative registration mechanism for error pages, with clear hierarchies that align with Spring's dependency injection pattern.
+This code demonstrates a Spring Boot error page configuration class ErrorPageConfiguration, which implements the ErrorPageRegistrar interface. It registers 404 and 500 error handling paths via the registerErrorPages method to ErrorPageRegistry. The class diagram includes core components: configuration class, interface, registry, error page entity, and HTTP status enumeration, clearly reflecting their implementation, dependency, and composition relationships.
 
 
 ### Internal Method Call Graph
@@ -72,10 +66,10 @@ graph TD
     A["Class ErrorPageConfiguration"]
     B["Annotation: @Component"]
     C["Implements Interface: ErrorPageRegistrar"]
-    D["Overridden Method: registerErrorPages(ErrorPageRegistry errorPageRegistry)"]
-    E["Invocation: errorPageRegistry.addErrorPages()"]
-    F["Create ErrorPage: HttpStatus.NOT_FOUND → '/error/404'"]
-    G["Create ErrorPage: HttpStatus.INTERNAL_SERVER_ERROR → '/error/500'"]
+    D["Overrides Method: registerErrorPages(ErrorPageRegistry)"]
+    E["Invokes: errorPageRegistry.addErrorPages()"]
+    F["Creates ErrorPage: HttpStatus.NOT_FOUND → '/error/404'"]
+    G["Creates ErrorPage: HttpStatus.INTERNAL_SERVER_ERROR → '/error/500'"]
 
     A --> B
     A --> C
@@ -85,7 +79,7 @@ graph TD
     E --> G
 ```
 
-This code represents a Spring component class that implements the ErrorPageRegistrar interface for registering custom error pages. When the system encounters 404 or 500 errors, it automatically redirects to specified error handling paths. The flowchart illustrates the complete call chain from class declaration to method implementation, including component annotation marking, interface implementation relationships, error page registration logic, and the configuration process for two specific error pages. The entire process demonstrates Spring Boot's error handling mechanism, which simplifies error page management through centralized configuration.
+This flowchart illustrates the registration process of the Spring component ErrorPageConfiguration. As an implementation class of the ErrorPageRegistrar interface, it registers two error pages with the container by overriding the registerErrorPages method: mapping the 404 status code to the '/error/404' path and the 500 status code to the '/error/500' path. The entire process demonstrates Spring Boot's centralized configuration mechanism for error pages.
 
 ### Field List
 

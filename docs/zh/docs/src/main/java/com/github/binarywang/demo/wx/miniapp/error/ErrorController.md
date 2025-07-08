@@ -11,13 +11,13 @@
 
 # 说明
 
-这是一个Spring MVC控制器类，专门用于处理错误页面请求。类名为ErrorController，通过@RequestMapping注解映射到"/error"路径。类中包含两个处理GET请求的方法：error404方法处理"/404"路径的请求，error500方法处理"/500"路径的请求。两个方法都返回名为"error"的视图字符串，表示它们都会渲染同一个错误页面模板。该控制器主要用于展示404和500等HTTP错误状态码对应的自定义错误页面。
+这是一个Spring MVC控制器类，专门用于处理错误页面请求。类上标注了Controller注解，表明这是一个控制器组件。RequestMapping注解指定了基础路径为/error。类中包含两个方法：error404方法处理HTTP 404错误的GET请求，映射路径为/error/404；error500方法处理HTTP 500错误的GET请求，映射路径为/error/500。两个方法都返回名为error的视图字符串，表示将渲染error模板页面来显示错误信息。
 
 # 类列表 Class Summary
 
 | 名称   | 类型  | 说明 |
 |-------|------|-------------|
-| ErrorController | class | ErrorController类处理404和500错误，返回error页面。 |
+| ErrorController | class | ErrorController处理404和500错误，返回统一错误页面。 |
 
 
 
@@ -28,7 +28,7 @@
 | 访问范围 | @Controller;@RequestMapping("/error");public |
 | 类型 | class |
 | 名称 | ErrorController |
-| 说明 | ErrorController类处理404和500错误，返回error页面。 |
+| 说明 | ErrorController处理404和500错误，返回统一错误页面。 |
 
 
 ### UML类图
@@ -41,15 +41,14 @@ classDiagram
         +error500() String
     }
     ErrorController --> SpringFramework : 依赖
-    note for ErrorController "处理HTTP错误页面的控制器"
+    note for ErrorController "处理/404和/500错误请求的控制器"
 
-    class SpringFramework {
-        <<Framework>>
+    <<Interface>> SpringFramework {
+        <<Spring MVC框架接口>>
     }
 ```
 
-类图描述：
-该图展示了一个Spring MVC控制器类ErrorController，它被标记为@Controller注解，用于处理"/error"路径下的HTTP请求。类中包含两个公共方法：error404()和error500()，分别对应处理404和500错误页面请求，都返回"error"视图名称。该类依赖于Spring框架的基础功能，通过@RequestMapping和@GetMapping注解实现请求路由映射。这是一个典型的Spring Web MVC控制器实现，集中处理系统错误页面路由。
+这段代码展示了一个Spring MVC的错误控制器类，用于处理404和500错误请求。ErrorController类标注了@Controller注解，表明这是一个Spring MVC控制器，并通过@RequestMapping定义了基础路径"/error"。类中包含两个处理GET请求的方法：error404()和error500()，分别对应404和500错误路径，两者都返回相同的"error"视图名称。该类依赖于Spring框架提供的MVC功能来实现请求映射和处理。
 
 
 ### 内部方法调用关系图
@@ -58,25 +57,24 @@ classDiagram
 graph TD
     A["类ErrorController"]
     B["注解: @Controller"]
-    C["类级映射: @RequestMapping('/error')"]
+    C["类注解: @RequestMapping('/error')"]
     D["方法: error404()"]
-    E["方法级映射: @GetMapping('/404')"]
-    F["返回: 'error'"]
-    G["方法: error500()"]
-    H["方法级映射: @GetMapping('/500')"]
-    I["返回: 'error'"]
+    E["方法注解: @GetMapping('/404')"]
+    F["方法: error500()"]
+    G["方法注解: @GetMapping('/500')"]
+    H["返回值: 'error'"]
 
     A --> B
     A --> C
     A --> D
+    A --> F
     D --> E
-    D --> F
-    A --> G
-    G --> H
-    G --> I
+    D --> H
+    F --> G
+    F --> H
 ```
 
-该流程图展示了Spring MVC中ErrorController类的结构，包含类级别的@RequestMapping注解和两个处理不同错误路径的方法。每个方法通过@GetMapping映射特定错误码路径（/404和/500），均返回"error"视图名称。控制器类标记为@Controller，表明这是一个处理HTTP请求的组件，整体设计用于集中处理系统错误页面跳转逻辑。
+该流程图展示了Spring MVC控制器ErrorController的结构，包含两个处理不同错误路径的方法。类级别使用@Controller和@RequestMapping注解定义基础路径，两个方法分别通过@GetMapping处理404和500错误请求，均返回"error"视图名称。箭头清晰表示了注解、方法和返回值之间的关联关系。
 
 ### 字段列表 Field List
 
@@ -87,8 +85,8 @@ graph TD
 
 | 名称  | 类型  | 说明 |
 |-------|-------|------|
-| error500 | String | Spring MVC接口，GET请求路径"/500"，返回字符串"error"。 |
-| error404 | String | Spring MVC控制器方法，处理GET请求路径"/404"，返回字符串"error"。 |
+| error500 | String | 这是一个Spring MVC的GET请求处理方法，映射路径为"/500"，返回字符串"error"。 |
+| error404 | String | 这是一个Spring MVC的GET请求处理方法，路径为"/404"，返回字符串"error"。 |
 
 
 

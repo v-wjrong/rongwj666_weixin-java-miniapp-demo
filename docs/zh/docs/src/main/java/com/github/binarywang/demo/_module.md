@@ -6,15 +6,15 @@
 | 编码语言 | .java |
 | 代码路径 | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo |
 | 包名 | docs.src.main.java.com.github.binarywang.demo |
-| 概述说明 | 微信小程序后端核心模块，含媒体管理、用户信息处理和消息路由功能，遵循微信标准，依赖微信JSSDK和Spring Boot。错误处理模块统一管理HTTP错误状态码，自定义错误页面。多账号配置模块动态管理小程序账号和消息路由。应用入口类基于Spring Boot启动。 |
+| 概述说明 | Spring Boot微信小程序Demo，含启动类、控制器、JSON工具、错误处理和配置模块。控制器处理媒体、用户和消息，工具类处理JSON序列化，错误模块统一处理HTTP错误，配置模块管理多账号和消息服务。 |
 
 # 说明
 
 ## 概述  
-该模块是微信小程序后端核心系统，整合了媒体管理、用户认证、消息路由和错误处理四大功能。采用Spring Boot框架，遵循微信开放平台规范，关键结构包括Media_id列表、用户会话信息和消息处理器映射。依赖微信JSSDK、Lombok和Spring Web组件。例如上传素材返回media_id，用户登录通过code换取openid，错误处理支持自定义404页面。JSON序列化工具采用配置化的ObjectMapper实现高效转换。
+该模块是微信小程序后端服务的Spring Boot实现，核心职责包括媒体文件管理、用户会话处理、微信消息交互和错误统一处理。采用RESTful接口规范，支持JSON/XML数据格式，关键数据结构涵盖Media_id列表、用户会话信息（sessionKey/openid）和微信消息体。外部依赖微信服务器API、AES加密库、Spring Web框架和Lombok。例如媒体控制器处理文件上传，用户控制器管理登录授权，配置模块初始化多账号服务。
 
 ## 主要业务场景  
-系统实现小程序全生命周期管理：媒体文件类似CDN操作，用户认证遵循OAuth2.0流程，消息路由采用事件总线模式，错误处理仿前端路由拦截。典型流程包括校验请求→业务处理→资源清理三阶段，例如解密加密手机号需验证会话密钥。集成案例覆盖五类消息处理，异常通过日志降级处理。启动类通过@SpringBootApplication初始化多账号配置服务。
+模块支持四类典型交互：媒体传输（类似FTP）、身份认证（类似OAuth）、消息处理（类似事件总线）和错误兜底（类似路由拦截器）。业务流程遵循"校验-处理-清理"模式，例如用户登录先验证code再获取会话信息。典型应用包括上传临时素材、解密用户手机号和处理加密消息，所有接口严格校验appid确保多租户隔离。集成案例可见订阅消息推送和500错误页渲染。
 
 
 ### 包内部结构视图
@@ -23,11 +23,11 @@
 graph TD
     demo --> wx
     wx --> miniapp
+    miniapp --> WxMaDemoApplication.java
     miniapp --> controller
     miniapp --> utils
     miniapp --> error
     miniapp --> config
-    miniapp --> WxMaDemoApplication.java
     controller --> WxMaMediaController.java
     controller --> WxMaUserController.java
     controller --> WxPortalController.java
@@ -38,12 +38,12 @@ graph TD
     config --> WxMaConfiguration.java
 ```
 
-该流程图展示了微信小程序Demo项目的核心代码结构。根节点"demo"下包含"wx"模块，其子模块"miniapp"作为核心容器，包含控制器、工具类、错误处理、配置等子目录及主应用类。控制器目录下有三个API控制器，工具类包含JSON处理工具，错误处理包含全局异常控制，配置目录存放小程序相关参数配置类。
+该流程图展示了微信小程序Demo项目的核心结构，从根目录demo开始，逐级展开到wx和miniapp层。miniapp包含主应用类、控制器、工具类、错误处理及配置模块，其中控制器下有三个具体实现类，错误处理和配置模块各有两个组件，整体结构清晰体现了典型Spring Boot应用的分层设计。
 
 # 文件列表
 
 | 名称   | 类型  | 说明 |
 |-------|------|-------------|
-| [wx](wx/_module.md) | package | 微信小程序后端核心模块，含媒体管理、用户信息处理和消息路由功能，遵循微信标准，依赖微信JSSDK和Spring Boot。错误处理模块统一管理HTTP错误状态码，自定义错误页面。多账号配置模块动态管理小程序账号和消息路由。应用入口类基于Spring Boot启动。 |
+| [wx](wx/_module.md) | package | Spring Boot微信小程序Demo，含启动类、控制器、JSON工具、错误处理和配置模块。控制器处理媒体、用户和消息，工具类处理JSON序列化，错误模块统一处理HTTP错误，配置模块管理多账号和消息服务。 |
 
 

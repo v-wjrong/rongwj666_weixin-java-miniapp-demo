@@ -6,15 +6,15 @@
 | 编码语言 | .java |
 | 代码路径 | weixin-java-miniapp-demo/src/main/java/com/github/binarywang/demo/wx/miniapp |
 | 包名 | docs.src.main.java.com.github.binarywang.demo.wx.miniapp |
-| 概述说明 | 微信小程序后端核心模块，含媒体管理、用户信息处理和消息路由功能，遵循微信标准，依赖微信JSSDK和Spring Boot。错误处理模块统一管理HTTP错误状态码，自定义错误页面。多账号配置模块动态管理小程序账号和消息路由。应用入口类基于Spring Boot启动。 |
+| 概述说明 | Spring Boot微信小程序Demo，含启动类、控制器、JSON工具、错误处理和配置模块。控制器处理媒体、用户和消息，工具类处理JSON序列化，错误模块统一处理HTTP错误，配置模块管理多账号和消息服务。 |
 
 # 说明
 
 ## 概述  
-该模块是微信小程序后端核心系统，整合了媒体管理、用户认证、消息路由和错误处理四大功能。采用Spring Boot框架，遵循微信开放平台规范，关键结构包括Media_id列表、用户会话信息和消息处理器映射。依赖微信JSSDK、Lombok和Spring Web组件。例如上传素材返回media_id，用户登录通过code换取openid，错误处理支持自定义404页面。JSON序列化工具采用配置化的ObjectMapper实现高效转换。
+该模块是微信小程序后端服务的Spring Boot实现，核心职责包括媒体文件管理、用户会话处理、微信消息交互和错误统一处理。采用RESTful接口规范，支持JSON/XML数据格式，关键数据结构涵盖Media_id列表、用户会话信息（sessionKey/openid）和微信消息体。外部依赖微信服务器API、AES加密库、Spring Web框架和Lombok。例如媒体控制器处理文件上传，用户控制器管理登录授权，配置模块初始化多账号服务。
 
 ## 主要业务场景  
-系统实现小程序全生命周期管理：媒体文件类似CDN操作，用户认证遵循OAuth2.0流程，消息路由采用事件总线模式，错误处理仿前端路由拦截。典型流程包括校验请求→业务处理→资源清理三阶段，例如解密加密手机号需验证会话密钥。集成案例覆盖五类消息处理，异常通过日志降级处理。启动类通过@SpringBootApplication初始化多账号配置服务。
+模块支持四类典型交互：媒体传输（类似FTP）、身份认证（类似OAuth）、消息处理（类似事件总线）和错误兜底（类似路由拦截器）。业务流程遵循"校验-处理-清理"模式，例如用户登录先验证code再获取会话信息。典型应用包括上传临时素材、解密用户手机号和处理加密消息，所有接口严格校验appid确保多租户隔离。集成案例可见订阅消息推送和500错误页渲染。
 
 
 ### 包内部结构视图
@@ -36,16 +36,16 @@ graph TD
     config --> WxMaConfiguration.java
 ```
 
-该流程图展示了微信小程序Demo项目的目录结构，根目录miniapp下包含主应用类、控制器包、工具包、错误处理包和配置包。控制器包中包含三个微信媒体、用户和门户控制器，工具包包含JSON工具类，错误处理包包含错误控制器和页面配置，配置包包含属性配置和主配置类。结构清晰展示了典型的Spring Boot项目分层架构。
+该流程图展示了微信小程序Demo项目的核心代码结构，根节点miniapp下包含主应用类、控制器包、工具类包、错误处理包和配置包。控制器包中包含三个功能控制器，分别处理媒体、用户和门户请求；错误处理包包含错误控制器和页面配置；配置包则存放小程序属性及配置类。整体结构清晰体现了典型Spring Boot应用的分层架构。
 
 # 文件列表
 
 | 名称   | 类型  | 说明 |
 |-------|------|-------------|
-| [WxMaDemoApplication.java](WxMaDemoApplication.md) | file | 这是一个Spring Boot应用的主类，使用@SpringBootApplication注解标记，通过main方法启动应用。 |
-| [controller](controller/_module.md) | package | 微信小程序三个控制器类：媒体控制器处理文件上传下载；用户控制器管理登录、用户信息和手机号；门户控制器处理认证和消息路由。均包含ThreadLocal清理和日志记录。 |
-| [config](config/_module.md) | package | 微信小程序配置类WxMaProperties绑定wx.miniapp前缀，含多小程序配置列表，每个配置含appid、secret等字段。WxMaConfiguration类初始化小程序服务并配置消息路由，处理文本、图片等消息类型，含上传和生成功能。 |
-| [error](error/_module.md) | package | ErrorController类处理/error路径请求，包含404和500错误处理方法，返回error视图。ErrorPageConfiguration类注册404和500错误页面的跳转路径。 |
-| [utils](utils/_module.md) | package | JsonUtils类提供静态方法toJson，使用ObjectMapper将对象转为JSON字符串，自动忽略null值并格式化输出。 |
+| [WxMaDemoApplication.java](WxMaDemoApplication.md) | file | SpringBoot应用启动类，包含主方法运行Spring应用。 |
+| [config](config/_module.md) | package | WxMaProperties类配置微信小程序属性，含appid、secret等字段。WxMaConfiguration类初始化小程序服务和消息路由，定义各类消息处理器逻辑。 |
+| [error](error/_module.md) | package | Spring MVC控制器处理404/500错误，返回error视图。配置类注册错误页面，404跳/error/404，500跳/error/500。 |
+| [utils](utils/_module.md) | package | JsonUtils工具类使用ObjectMapper实现对象转JSON字符串，自动忽略null值并格式化输出，异常时返回null。 |
+| [controller](controller/_module.md) | package | 微信小程序控制器类：媒体控制器处理文件上传下载，用户控制器管理登录/信息/手机号功能，门户控制器负责认证和消息处理。所有接口验证appid并确保线程安全。 |
 
 
